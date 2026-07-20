@@ -1,0 +1,36 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+                    xmlns:sys="clr-namespace:System;assembly=mscorlib">
+
+    <!--
+        Puerto de config/AppDimensions.java, CORRIGIENDO los valores que no coincidían
+        con lo que MainFrame.java realmente usaba en tiempo de ejecución:
+          - SIDEBAR_WIDTH declaraba 220 pero MainFrame.crearSidebar() fijaba 245 -> aquí
+            SidebarWidth=245 (el valor real usado).
+          - TOPBAR_HEIGHT declaraba 60 pero MainFrame.crearTopBar() fijaba 62 -> aquí
+            TopBarHeight=62 (el valor real usado).
+          - CARD_INSETS declaraba Insets(16,16,16,16) pero varias pantallas usaban
+            valores ad hoc distintos (12,18,12,18 / 15,18,15,18) -> aquí CardPadding se
+            fija en Thickness(16) y es de uso obligatorio para toda tarjeta/panel.
+    -->
+
+    <sys:Double x:Key="SidebarWidth">245</sys:Double>
+    <sys:Double x:Key="TopBarHeight">62</sys:Double>
+    <sys:Double x:Key="StatusBarHeight">34</sys:Double>
+    <sys:Double x:Key="CardRadius">12</sys:Double>
+    <sys:Double x:Key="GapSmall">8</sys:Double>
+    <sys:Double x:Key="GapMedium">16</sys:Double>
+    <sys:Double x:Key="GapLarge">24</sys:Double>
+
+    <Thickness x:Key="CardPadding">16</Thickness>
+    <CornerRadius x:Key="CardCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="PillCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="ButtonCornerRadius">8</CornerRadius>
+    <CornerRadius x:Key="TextBoxCornerRadius">6</CornerRadius>
+
+    <!-- DataGrid: puerto de SwingUtils.formatearTabla() -->
+    <sys:Double x:Key="DataGridRowHeight">34</sys:Double>
+    <sys:Double x:Key="DataGridHeaderHeight">38</sys:Double>
+    <Thickness x:Key="DataGridCellPadding">12,0,12,0</Thickness>
+
+</ResourceDictionary>

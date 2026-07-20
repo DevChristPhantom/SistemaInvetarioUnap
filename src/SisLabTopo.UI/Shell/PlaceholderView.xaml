@@ -1,0 +1,21 @@
+<UserControl x:Class="SisLabTopo.UI.Shell.PlaceholderView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:SisLabTopo.UI.Controls"
+             mc:Ignorable="d"
+             d:DesignWidth="800" d:DesignHeight="500">
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <controls:RoundedCard HorizontalAlignment="Center" VerticalAlignment="Center" Padding="40">
+            <StackPanel HorizontalAlignment="Center">
+                <TextBlock Text="{Binding Titulo}" Style="{StaticResource TitleStyle}" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding Mensaje}"
+                           Style="{StaticResource BodyStyle}"
+                           Foreground="{StaticResource TextLightBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,8,0,0"/>
+            </StackPanel>
+        </controls:RoundedCard>
+    </Grid>
+</UserControl>

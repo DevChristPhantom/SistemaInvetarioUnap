@@ -1,0 +1,28 @@
+<UserControl x:Class="SisLabTopo.UI.Controls.StatusBadge"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             HorizontalAlignment="Left"
+             VerticalAlignment="Center"
+             d:DesignWidth="90" d:DesignHeight="22">
+    <!--
+        Píldora de estado de una sola pieza, reutilizable en TODA la app (Fase 5): texto
+        blanco negrita pequeño sobre fondo redondeado (arc~12), padding 4,10,4,10. Corrige
+        explícitamente la inconsistencia de Java donde "Disponible" se mostraba como
+        píldora en un lugar (EquiposPanel) y como texto plano true/false en otro
+        (algunos diálogos): a partir de esta fase, cualquier estado/disponibilidad se
+        muestra SIEMPRE con este control.
+    -->
+    <Border Background="{Binding BadgeBrush, RelativeSource={RelativeSource AncestorType=UserControl}}"
+            CornerRadius="{StaticResource PillCornerRadius}"
+            Padding="10,4,10,4">
+        <TextBlock Text="{Binding BadgeText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                   Foreground="White"
+                   FontFamily="{StaticResource AppFontFamily}"
+                   FontSize="11"
+                   FontWeight="Bold"
+                   HorizontalAlignment="Center"/>
+    </Border>
+</UserControl>

@@ -1,0 +1,135 @@
+<Window x:Class="SisLabTopo.UI.Login.LoginView"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        mc:Ignorable="d"
+        Title="SisLab-Topo — Acceso al Sistema"
+        Width="1000" Height="620"
+        MinWidth="760" MinHeight="520"
+        WindowStartupLocation="CenterScreen"
+        Background="White">
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="0.42*"/>
+            <ColumnDefinition Width="0.58*"/>
+        </Grid.ColumnDefinitions>
+
+        <!-- ===================== IZQUIERDA: formulario ===================== -->
+        <Grid Grid.Column="0" Margin="40">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*"/>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="*"/>
+            </Grid.RowDefinitions>
+
+            <StackPanel Grid.Row="1" HorizontalAlignment="Stretch">
+
+                <TextBlock Text="ACCESO ADMINISTRATIVO"
+                           Style="{StaticResource SmallStyle}"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource PrimaryBrush}"
+                           HorizontalAlignment="Left"
+                           Margin="0,0,0,20"/>
+
+                <Ellipse Width="90" Height="90" Fill="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
+
+                <TextBlock Text="Bienvenido"
+                           FontFamily="{StaticResource AppFontFamily}"
+                           FontSize="28" FontWeight="Bold"
+                           Foreground="{StaticResource PrimaryBrush}"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,4"/>
+
+                <TextBlock Text="Ingresa tu contraseña para acceder al sistema administrativo."
+                           Style="{StaticResource SmallStyle}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"
+                           Margin="0,0,0,20"/>
+
+                <PasswordBox x:Name="PasswordInput"
+                             Height="46"
+                             FontSize="15"
+                             KeyDown="PasswordInput_KeyDown"/>
+
+                <TextBlock Text="{Binding ErrorMessage}"
+                           Style="{StaticResource SmallStyle}"
+                           FontWeight="Bold"
+                           Foreground="{StaticResource DangerBrush}"
+                           TextAlignment="Center"
+                           TextWrapping="Wrap"
+                           HorizontalAlignment="Center"
+                           Margin="0,10,0,0"
+                           Visibility="{Binding ErrorMessage, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                <Button x:Name="BtnIngresar"
+                        Content="INICIAR SESIÓN"
+                        Style="{StaticResource PrimaryButtonStyle}"
+                        Height="42"
+                        Margin="0,16,0,0"
+                        Click="BtnIngresar_Click"
+                        IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
+
+                <TextBlock Text="Acceso restringido solo para administradores."
+                           Style="{StaticResource SmallStyle}"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"
+                           Margin="0,20,0,0"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- ===================== DERECHA: institucional ===================== -->
+        <Border Grid.Column="1">
+            <Border.Background>
+                <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                    <GradientStop Color="#0A1D37" Offset="0"/>
+                    <GradientStop Color="#0E4C92" Offset="1"/>
+                </LinearGradientBrush>
+            </Border.Background>
+            <Grid Margin="40">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
+                    <StackPanel Margin="0,0,40,0" Width="150">
+                        <Image Source="/Assets/Logo_UNAP.png" Width="110" Height="110"/>
+                        <TextBlock Text="UNIVERSIDAD NACIONAL DEL ALTIPLANO"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontWeight="Bold"
+                                   FontSize="12" Foreground="White"
+                                   TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0"/>
+                        <TextBlock Text="PUNO"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontSize="11" Foreground="#b0c4de"
+                                   TextAlignment="Center"/>
+                    </StackPanel>
+                    <StackPanel Width="150">
+                        <Image Source="/Assets/Logo_Minas.png" Width="110" Height="110"/>
+                        <TextBlock Text="ESCUELA PROFESIONAL DE INGENIERÍA DE MINAS"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontWeight="Bold"
+                                   FontSize="12" Foreground="White"
+                                   TextWrapping="Wrap" TextAlignment="Center" Margin="0,10,0,0"/>
+                        <TextBlock Text="UNA - PUNO"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontSize="11" Foreground="#b0c4de"
+                                   TextAlignment="Center"/>
+                    </StackPanel>
+                </StackPanel>
+
+                <Border Grid.Row="2" VerticalAlignment="Bottom" HorizontalAlignment="Center"
+                        Background="#1EFFFFFF" CornerRadius="16" Padding="25,8" Margin="0,0,0,10">
+                    <TextBlock Text="Sistema Administrativo   |   Seguridad, Control y Gestión"
+                               FontFamily="{StaticResource AppFontFamily}"
+                               FontSize="11" FontWeight="Bold"
+                               Foreground="White"/>
+                </Border>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>

@@ -1,0 +1,63 @@
+<UserControl x:Class="SisLabTopo.UI.Controls.SearchableDataGrid"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             mc:Ignorable="d"
+             d:DesignWidth="600" d:DesignHeight="360">
+    <!--
+        TextBox de búsqueda (icono de lupa + botón de limpiar) sobre un DataGrid
+        estilizado, con filtrado case-insensitive vía ICollectionView.Filter. Puerto
+        funcional de ui.components.SearchableTable<T> (Java). Los iconos de lupa/limpiar
+        se dibujan con la fuente "Segoe MDL2 Assets" (incluida en Windows) en vez de
+        emojis o PNGs, igual de "sin emojis, vectorial" que el criterio ya usado en
+        LoginPanel.java, sin añadir ningún paquete de iconos externo.
+    -->
+    <DockPanel LastChildFill="True">
+        <Border DockPanel.Dock="Top"
+                Margin="0,0,0,10"
+                Background="White"
+                BorderBrush="{StaticResource BorderLightBrush}"
+                BorderThickness="1"
+                CornerRadius="{StaticResource TextBoxCornerRadius}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="&#xE721;"
+                           FontFamily="Segoe MDL2 Assets"
+                           FontSize="14"
+                           Foreground="{StaticResource TextLightBrush}"
+                           VerticalAlignment="Center"
+                           Margin="10,0,4,0"/>
+
+                <TextBox x:Name="PART_SearchBox"
+                         Grid.Column="1"
+                         BorderThickness="0"
+                         Background="Transparent"
+                         Padding="4,8"
+                         VerticalContentAlignment="Center"
+                         Tag="Buscar..."
+                         Text="{Binding SearchText, RelativeSource={RelativeSource AncestorType=UserControl}, UpdateSourceTrigger=PropertyChanged}"/>
+
+                <Button Grid.Column="2"
+                        Style="{StaticResource LinkButtonStyle}"
+                        Content="&#xE711;"
+                        FontFamily="Segoe MDL2 Assets"
+                        FontSize="12"
+                        Padding="8,0,10,0"
+                        ToolTip="Limpiar búsqueda"
+                        Visibility="{Binding HasSearchText, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}"
+                        Click="ClearButton_Click"/>
+            </Grid>
+        </Border>
+
+        <DataGrid x:Name="PART_DataGrid"
+                  DockPanel.Dock="Bottom"
+                  SelectionChanged="InnerDataGrid_SelectionChanged"/>
+    </DockPanel>
+</UserControl>
