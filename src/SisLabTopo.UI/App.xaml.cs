@@ -1,5 +1,7 @@
 using System.IO;
 using System.Windows;
+using System.Windows.Interop;
+using System.Windows.Media;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -31,6 +33,22 @@ public partial class App : Application
     protected override async void OnStartup(StartupEventArgs e)
     {
         base.OnStartup(e);
+
+        // Fuerza el pipeline de renderizado de WPF (Milcore/Direct3D) a modo software.
+        // Diagnóstico: en máquinas/VMs sin aceleración 3D confiable (o con el driver de
+        // GPU deshabilitado/virtualizado -- el caso de esta estación de desarrollo), el
+        // "tier" de render por hardware que WPF detecta al arrancar queda en un estado en
+        // el que el marco de la ventana (dibujado por DWM, fuera de WPF) se ve
+        // perfectamente, pero la superficie de composición de WPF (todo lo que SÍ dibuja
+        // WPF: Grid, Border, TextBlock, etc.) se presenta en blanco -- sin ninguna
+        // excepción, porque no es un error de binding/plantilla: Loaded, los bindings y
+        // el DispatcherTimer del lockout siguen corriendo con total normalidad, ya que el
+        // árbol visual SÍ existe, solo no se pinta. Establecer ProcessRenderMode a
+        // SoftwareOnly (antes de crear cualquier ventana) obliga a WPF a componer con el
+        // rasterizador por software en vez de Direct3D, lo cual resuelve este problema a
+        // costa de un pequeño impacto de rendimiento, aceptable para una app de
+        // formularios como esta.
+        RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
 
         ConfigurarSerilog();
 
