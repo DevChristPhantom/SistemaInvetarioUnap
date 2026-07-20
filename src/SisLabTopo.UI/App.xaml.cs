@@ -2,6 +2,8 @@ using System.IO;
 using System.Windows;
 using System.Windows.Interop;
 using System.Windows.Media;
+using LiveChartsCore;
+using LiveChartsCore.SkiaSharpView;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -49,6 +51,14 @@ public partial class App : Application
         // costa de un pequeño impacto de rendimiento, aceptable para una app de
         // formularios como esta.
         RenderOptions.ProcessRenderMode = RenderMode.SoftwareOnly;
+
+        // Inicialización requerida por LiveCharts2 (Dashboard, Fase 5b) antes de crear
+        // cualquier control de gráfico: registra el "motor de dibujo" SkiaSharp (los
+        // controles WPF de LiveChartsCore.SkiaSharpView.WPF renderizan sobre un
+        // WriteableBitmap propio vía SkiaSharp, no sobre el pipeline Direct3D de WPF, así
+        // que conviven sin problema con el RenderMode.SoftwareOnly forzado arriba) y los
+        // mapeadores por defecto (tipos numéricos simples -> punto de datos).
+        LiveCharts.Configure(config => config.AddSkiaSharp().AddDefaultMappers());
 
         ConfigurarSerilog();
 

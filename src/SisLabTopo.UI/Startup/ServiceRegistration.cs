@@ -1,6 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
+using SisLabTopo.UI.Configuracion;
+using SisLabTopo.UI.Dashboard;
 using SisLabTopo.UI.Dialogs;
 using SisLabTopo.UI.Equipos;
+using SisLabTopo.UI.Historial;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Navigation;
 using SisLabTopo.UI.Prestamos;
@@ -42,9 +45,9 @@ public static class ServiceRegistration
         services.AddScoped<LoginViewModel>();
         services.AddScoped<ShellViewModel>();
 
-        // ViewModels de contenido del Shell (Fase 4: placeholders; Fase 5: Equipos y
-        // Préstamos ya son reales -- Dashboard/Historial/Configuración siguen
-        // pendientes de la fase siguiente).
+        // ViewModels de contenido del Shell. Fase 5a ya había reemplazado Equipos y
+        // Préstamos; esta fase (5b) reemplaza los 3 restantes (Dashboard/Historial/
+        // Configuración), que hasta ahora eran PlaceholderViewModel.
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<EquiposViewModel>();
         services.AddTransient<PrestamosViewModel>();
@@ -61,6 +64,7 @@ public static class ServiceRegistration
         services.AddTransient<Prestamos.DevolucionView>();
         services.AddTransient<Prestamos.ComprobantePreviewView>();
         services.AddTransient<Prestamos.DetallePrestamoView>();
+        services.AddTransient<Dashboard.SeleccionarPrestamoActivoView>();
 
         services.AddSingleton<IDialogService>(sp => new DialogService(sp, new Dictionary<Type, Type>
         {
@@ -70,6 +74,7 @@ public static class ServiceRegistration
             [typeof(DevolucionViewModel)] = typeof(Prestamos.DevolucionView),
             [typeof(ComprobantePreviewViewModel)] = typeof(Prestamos.ComprobantePreviewView),
             [typeof(DetallePrestamoViewModel)] = typeof(Prestamos.DetallePrestamoView),
+            [typeof(SeleccionarPrestamoActivoViewModel)] = typeof(Dashboard.SeleccionarPrestamoActivoView),
         }));
 
 #if DEBUG

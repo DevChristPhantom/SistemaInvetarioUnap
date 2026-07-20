@@ -1,0 +1,230 @@
+<UserControl x:Class="SisLabTopo.UI.Dashboard.DashboardView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:SisLabTopo.UI.Controls"
+             xmlns:dashboard="clr-namespace:SisLabTopo.UI.Dashboard"
+             xmlns:lvc="clr-namespace:LiveChartsCore.SkiaSharpView.WPF;assembly=LiveChartsCore.SkiaSharpView.WPF"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=dashboard:DashboardViewModel}"
+             d:DesignWidth="1300" d:DesignHeight="760">
+    <!--
+        Puerto funcional de DashboardPanel.java: 4 StatCard arriba, rejilla 60/40 debajo
+        (izquierda: 2 gráficos + 2 mini-tablas; derecha: Acciones Rápidas +
+        Disponibilidad Rápida). Todo deshabilitado (IsEnabled) mientras IsBusy, igual que
+        el resto de pantallas de la Fase 5.
+    -->
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- ===================== Fila 1: tarjetas de estadística ===================== -->
+        <Grid Grid.Row="0" Margin="0,0,0,16" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+
+            <controls:StatCard Grid.Column="0" Margin="0,0,8,0"
+                                Title="Total Equipos" Value="{Binding TotalEquiposTexto}" Description="Registrados"
+                                IconGlyph="EQ" IconBrush="{StaticResource PrimaryBrush}"/>
+            <controls:StatCard Grid.Column="1" Margin="8,0,8,0"
+                                Title="Equipos Disponibles" Value="{Binding EquiposDisponiblesTexto}" Description="Listos para préstamo"
+                                IconGlyph="OK" IconBrush="{StaticResource SuccessBrush}"/>
+            <controls:StatCard Grid.Column="2" Margin="8,0,8,0"
+                                Title="Préstamos Activos" Value="{Binding PrestamosActivosTexto}" Description="Equipos en préstamo"
+                                IconGlyph="PR" IconBrush="{StaticResource AccentBrush}"/>
+            <controls:StatCard Grid.Column="3" Margin="8,0,0,0"
+                                Title="Devoluciones Hoy" Value="{Binding DevolucionesHoyTexto}" Description="Esperando devolución"
+                                IconGlyph="DV">
+                <controls:StatCard.IconBrush>
+                    <SolidColorBrush Color="#6f42c1"/>
+                </controls:StatCard.IconBrush>
+            </controls:StatCard>
+        </Grid>
+
+        <!-- ===================== Fila 2: rejilla 60/40 ===================== -->
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="0.6*"/>
+                <ColumnDefinition Width="0.4*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- ===== Columna izquierda: gráficos + tablas ===== -->
+            <Grid Grid.Column="0" Margin="0,0,16,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <!-- Gráficos -->
+                <Grid Grid.Row="0" Margin="0,0,0,16">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Donut: distribución de equipos por estado -->
+                    <controls:RoundedCard Grid.Column="0" Margin="0,0,8,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Distribución de Equipos por Estado" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
+                            <Grid Grid.Row="1">
+                                <lvc:PieChart Series="{Binding SeriesEstadoEquipos}"
+                                              LegendPosition="Bottom"
+                                              Visibility="{Binding HayDatosGraficoEstado, Converter={StaticResource BoolToVisibilityConverter}}"/>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            Visibility="{Binding SinDatosGraficoEstado, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="Sin datos disponibles" Style="{StaticResource BodyStyle}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Los datos aparecerán aquí cuando existan registros."
+                                               Style="{StaticResource SmallStyle}" HorizontalAlignment="Center"
+                                               TextWrapping="Wrap" TextAlignment="Center" MaxWidth="220" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </controls:RoundedCard>
+
+                    <!-- Barras: préstamos registrados por mes -->
+                    <controls:RoundedCard Grid.Column="1" Margin="8,0,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Préstamos Registrados por Mes" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
+                            <lvc:CartesianChart Grid.Row="1"
+                                                 Series="{Binding SeriesPrestamosPorMes}"
+                                                 XAxes="{Binding XAxesPrestamosPorMes}"
+                                                 YAxes="{Binding YAxesPrestamosPorMes}"/>
+                        </Grid>
+                    </controls:RoundedCard>
+                </Grid>
+
+                <!-- Mini-tablas -->
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <!-- Últimos préstamos activos -->
+                    <controls:RoundedCard Grid.Column="0" Margin="0,0,8,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Últimos Préstamos Activos" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
+                            <Grid Grid.Row="1">
+                                <DataGrid ItemsSource="{Binding UltimosPrestamosActivos}"
+                                          Visibility="{Binding HayPrestamosActivosRecientes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Estudiante" Binding="{Binding NombreEstudiante}" Width="*"/>
+                                        <DataGridTextColumn Header="Curso" Binding="{Binding Curso}" Width="*"/>
+                                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaPrestamo, StringFormat='dd/MM HH:mm'}" Width="100"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            Visibility="{Binding SinPrestamosActivosRecientes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="No hay préstamos activos." Style="{StaticResource BodyStyle}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Los préstamos activos aparecerán aquí."
+                                               Style="{StaticResource SmallStyle}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </controls:RoundedCard>
+
+                    <!-- Equipos más prestados -->
+                    <controls:RoundedCard Grid.Column="1" Margin="8,0,0,0">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Text="Equipos Más Prestados (Top 5)" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
+                            <Grid Grid.Row="1">
+                                <DataGrid ItemsSource="{Binding EquiposMasPrestados}"
+                                          Visibility="{Binding HayEquiposMasPrestados, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <DataGrid.Columns>
+                                        <DataGridTextColumn Header="Código Equipo" Binding="{Binding Codigo}" Width="120"/>
+                                        <DataGridTextColumn Header="Denominación" Binding="{Binding Denominacion}" Width="*"/>
+                                        <DataGridTextColumn Header="Cant. Préstamos" Binding="{Binding Cantidad}" Width="110"/>
+                                    </DataGrid.Columns>
+                                </DataGrid>
+                                <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
+                                            Visibility="{Binding SinEquiposMasPrestados, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <TextBlock Text="No hay datos para mostrar." Style="{StaticResource BodyStyle}" FontWeight="Bold" HorizontalAlignment="Center"/>
+                                    <TextBlock Text="Los equipos más prestados aparecerán aquí."
+                                               Style="{StaticResource SmallStyle}" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                                </StackPanel>
+                            </Grid>
+                        </Grid>
+                    </controls:RoundedCard>
+                </Grid>
+            </Grid>
+
+            <!-- ===== Columna derecha: Acciones Rápidas + Disponibilidad Rápida ===== -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="0.4*"/>
+                    <RowDefinition Height="0.6*"/>
+                </Grid.RowDefinitions>
+
+                <controls:RoundedCard Grid.Row="0" Margin="0,0,0,16">
+                    <Grid IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Acciones Rápidas" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,10"/>
+                        <StackPanel Grid.Row="1" VerticalAlignment="Top">
+                            <Button Content="Nuevo Préstamo de Equipos" Command="{Binding NuevoPrestamoCommand}"
+                                    Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="0,0,0,8"/>
+                            <Button Content="Registrar Devolución Rápida" Command="{Binding RegistrarDevolucionRapidaCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8"/>
+                            <Button Content="Registrar Nuevo Equipo" Command="{Binding RegistrarNuevoEquipoCommand}"
+                                    Style="{StaticResource PrimaryButtonStyle}" Height="38" Margin="0,0,0,8"/>
+                            <Button Content="Importar Equipos (Excel)" Command="{Binding ImportarEquiposExcelCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8"/>
+                            <Button Content="Exportar Inventario (Excel)" Command="{Binding ExportarInventarioExcelCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="38"/>
+                        </StackPanel>
+                    </Grid>
+                </controls:RoundedCard>
+
+                <controls:RoundedCard Grid.Row="1">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*"/>
+                        </Grid.RowDefinitions>
+                        <TextBlock Grid.Row="0" Text="Disponibilidad Rápida" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
+                        <controls:SearchableDataGrid Grid.Row="1" ItemsSource="{Binding EquiposDisponiblesRapida}">
+                            <controls:SearchableDataGrid.Columns>
+                                <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="90"/>
+                                <DataGridTextColumn Header="Denominación" Binding="{Binding Denominacion}" Width="*"/>
+                                <DataGridTextColumn Header="Categoría" Binding="{Binding Tipo, Converter={StaticResource TipoEquipoToTextConverter}}" Width="100"/>
+                                <DataGridTemplateColumn Header="Estado" Width="90">
+                                    <DataGridTemplateColumn.CellTemplate>
+                                        <DataTemplate>
+                                            <controls:StatusBadge BadgeText="{Binding Estado, Converter={StaticResource EstadoEquipoToTextConverter}}"
+                                                                   BadgeBrush="{Binding Estado, Converter={StaticResource EstadoEquipoToBrushConverter}}"/>
+                                        </DataTemplate>
+                                    </DataGridTemplateColumn.CellTemplate>
+                                </DataGridTemplateColumn>
+                            </controls:SearchableDataGrid.Columns>
+                        </controls:SearchableDataGrid>
+                    </Grid>
+                </controls:RoundedCard>
+            </Grid>
+        </Grid>
+    </Grid>
+</UserControl>

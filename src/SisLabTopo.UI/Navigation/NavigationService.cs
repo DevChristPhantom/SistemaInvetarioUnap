@@ -1,6 +1,7 @@
 using System.Windows;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
+using SisLabTopo.UI.Dashboard;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Shell;
 

@@ -1,0 +1,59 @@
+<UserControl x:Class="SisLabTopo.UI.Configuracion.ConfiguracionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:SisLabTopo.UI.Controls"
+             xmlns:configuracion="clr-namespace:SisLabTopo.UI.Configuracion"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=configuracion:ConfiguracionViewModel}"
+             d:DesignWidth="900" d:DesignHeight="600">
+    <!--
+        Puerto funcional de MainFrame.crearConfiguracionPanel() (Java, inline): tarjeta
+        blanca redondeada anclada arriba a la izquierda (no estirada a lo ancho/alto
+        completo, igual que el "wrapper" de Java), con cambio de contraseña de
+        administrador. Mensajes de éxito/error inline (nunca un MessageBox bloqueante).
+    -->
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <controls:RoundedCard HorizontalAlignment="Left" VerticalAlignment="Top" Width="480">
+            <StackPanel IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+                <TextBlock Text="Cambiar Contraseña de Administrador" Style="{StaticResource TitleStyle}" FontSize="18"/>
+                <TextBlock Text="Actualice la clave de acceso al sistema administrativo."
+                           Style="{StaticResource SmallStyle}" Margin="0,4,0,20"/>
+
+                <TextBlock Text="Contraseña Actual" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
+                <PasswordBox x:Name="PasswordActual" Margin="0,0,0,14"
+                             PasswordChanged="PasswordActual_PasswordChanged"/>
+
+                <TextBlock Text="Nueva Contraseña (mín. 6 caracteres)" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
+                <PasswordBox x:Name="PasswordNueva" Margin="0,0,0,2"
+                             PasswordChanged="PasswordNueva_PasswordChanged"/>
+                <TextBlock Text="{Binding MensajeErrorNueva}"
+                           Style="{StaticResource SmallStyle}" FontWeight="Bold" Foreground="{StaticResource DangerBrush}"
+                           Margin="0,0,0,12"
+                           Visibility="{Binding MensajeErrorNueva, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                <TextBlock Text="Confirmar Nueva Contraseña" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
+                <PasswordBox x:Name="PasswordConfirmar" Margin="0,0,0,2"
+                             PasswordChanged="PasswordConfirmar_PasswordChanged"/>
+                <TextBlock Text="{Binding MensajeErrorConfirmar}"
+                           Style="{StaticResource SmallStyle}" FontWeight="Bold" Foreground="{StaticResource DangerBrush}"
+                           Margin="0,0,0,12"
+                           Visibility="{Binding MensajeErrorConfirmar, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                <TextBlock Text="{Binding MensajeExito}"
+                           Style="{StaticResource BodyStyle}" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"
+                           TextWrapping="Wrap" Margin="0,4,0,8"
+                           Visibility="{Binding MensajeExito, Converter={StaticResource StringToVisibilityConverter}}"/>
+                <TextBlock Text="{Binding MensajeError}"
+                           Style="{StaticResource BodyStyle}" FontWeight="Bold" Foreground="{StaticResource DangerBrush}"
+                           TextWrapping="Wrap" Margin="0,4,0,8"
+                           Visibility="{Binding MensajeError, Converter={StaticResource StringToVisibilityConverter}}"/>
+
+                <Button Content="Guardar Cambios" Command="{Binding GuardarCommand}"
+                        Style="{StaticResource SuccessButtonStyle}"
+                        HorizontalAlignment="Right" Width="170" Height="38" Margin="0,10,0,0"/>
+            </StackPanel>
+        </controls:RoundedCard>
+    </Grid>
+</UserControl>

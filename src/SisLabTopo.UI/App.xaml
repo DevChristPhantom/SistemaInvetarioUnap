@@ -3,9 +3,11 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SisLabTopo.UI"
              xmlns:converters="clr-namespace:SisLabTopo.UI.Converters"
-             xmlns:shell="clr-namespace:SisLabTopo.UI.Shell"
              xmlns:equipos="clr-namespace:SisLabTopo.UI.Equipos"
-             xmlns:prestamos="clr-namespace:SisLabTopo.UI.Prestamos">
+             xmlns:prestamos="clr-namespace:SisLabTopo.UI.Prestamos"
+             xmlns:dashboard="clr-namespace:SisLabTopo.UI.Dashboard"
+             xmlns:historial="clr-namespace:SisLabTopo.UI.Historial"
+             xmlns:configuracion="clr-namespace:SisLabTopo.UI.Configuracion">
     <!--
         Nota de arranque: esta app YA NO usa StartupUri (que crearía MainWindow
         automáticamente antes de que el host de DI de App.xaml.cs esté listo). El
@@ -35,23 +37,27 @@
             <converters:DisponibilidadToTextConverter x:Key="DisponibilidadToTextConverter"/>
 
             <!--
-                Navegación por contenido dentro del Shell: un único DataTemplate para el
-                ViewModel base PlaceholderViewModel cubre las 5 subclases concretas
-                (Dashboard/Equipos/Préstamos/Historial/Configuración de la Fase 4), ya
-                que WPF resuelve la plantilla implícita por el tipo exacto o el tipo base
-                más cercano. La Fase 5 reemplaza esto por un DataTemplate por cada
-                ViewModel real; el Shell no necesita cambios.
+                Navegación por contenido dentro del Shell: un DataTemplate explícito por
+                cada ViewModel real de los 5 destinos (Dashboard/Equipos/Préstamos/
+                Historial/Configuración). Los 3 últimos (Dashboard/Historial/
+                Configuración) reemplazan aquí, en la Fase 5b, al PlaceholderViewModel
+                genérico que usaba la Fase 4; Equipos y Préstamos ya habían sido
+                reemplazados por la Fase 5a.
             -->
-            <DataTemplate DataType="{x:Type shell:PlaceholderViewModel}">
-                <shell:PlaceholderView/>
-            </DataTemplate>
-
-            <!-- Fase 5: Equipos y Préstamos ya tienen su vista real (reemplazan su PlaceholderViewModel anterior). -->
             <DataTemplate DataType="{x:Type equipos:EquiposViewModel}">
                 <equipos:EquiposView/>
             </DataTemplate>
             <DataTemplate DataType="{x:Type prestamos:PrestamosViewModel}">
                 <prestamos:PrestamosView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type dashboard:DashboardViewModel}">
+                <dashboard:DashboardView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type historial:HistorialViewModel}">
+                <historial:HistorialView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type configuracion:ConfiguracionViewModel}">
+                <configuracion:ConfiguracionView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>
