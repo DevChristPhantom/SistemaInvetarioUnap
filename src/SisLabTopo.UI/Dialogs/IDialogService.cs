@@ -53,4 +53,14 @@ public interface IDialogService
 
     /// <summary>Abre el selector de archivo estándar de Windows para elegir dónde guardar un archivo. Devuelve <c>null</c> si el usuario cancela.</summary>
     string? ShowSaveFileDialog(string filter, string title, string defaultFileName);
+
+    /// <summary>
+    /// Copia texto al portapapeles del sistema (Fase 6: botón "Copiar" del código de
+    /// recuperación en el asistente de primer arranque y en la recuperación de
+    /// contraseña). Se abstrae aquí -- en vez de que los ViewModels llamen directamente a
+    /// <see cref="System.Windows.Clipboard"/> -- por el mismo motivo que el resto de esta
+    /// interfaz: mantener los ViewModels testeables con Moq sin depender de un hilo STA
+    /// real ni de infraestructura de WPF.
+    /// </summary>
+    void CopyToClipboard(string text);
 }

@@ -6,6 +6,7 @@ using SisLabTopo.UI.Equipos;
 using SisLabTopo.UI.Historial;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Navigation;
+using SisLabTopo.UI.PasswordRecovery;
 using SisLabTopo.UI.Prestamos;
 using SisLabTopo.UI.Shell;
 
@@ -41,6 +42,17 @@ public static class ServiceRegistration
         services.AddScoped<LoginView>();
         services.AddScoped<ShellView>();
 
+        // Asistente de primer arranque (Fase 6): también es una ventana raíz (sustituye
+        // a Login la primera vez que arranca la app, antes de que exista una contraseña
+        // de administrador configurada), pero se registra Transient -- a diferencia de
+        // Login/Shell -- a propósito: solo se usa una vez por la vida de la base de
+        // datos, y no queremos que la instancia (que llegó a tener en memoria el código
+        // de recuperación en texto plano, aunque ya se limpia explícitamente al
+        // continuar) quede cacheada indefinidamente por el resto de la sesión en el
+        // scope raíz de la aplicación.
+        services.AddTransient<FirstRunSetupView>();
+        services.AddTransient<FirstRunSetupViewModel>();
+
         // ViewModels de ventana raíz
         services.AddScoped<LoginViewModel>();
         services.AddScoped<ShellViewModel>();
@@ -66,6 +78,12 @@ public static class ServiceRegistration
         services.AddTransient<Prestamos.DetallePrestamoView>();
         services.AddTransient<Dashboard.SeleccionarPrestamoActivoView>();
 
+        // Diálogo de recuperación de contraseña (Fase 6): mismo patrón que los diálogos
+        // de la Fase 5 (ver comentario XML de IDialogService) -- la ventana se registra
+        // aquí para que DialogService pueda resolverla, pero su ViewModel lo construye
+        // directamente LoginViewModel vía `new`, nunca el contenedor de DI.
+        services.AddTransient<PasswordRecovery.PasswordRecoveryView>();
+
         services.AddSingleton<IDialogService>(sp => new DialogService(sp, new Dictionary<Type, Type>
         {
             [typeof(EquipoFormViewModel)] = typeof(Equipos.EquipoFormView),
@@ -75,12 +93,8 @@ public static class ServiceRegistration
             [typeof(ComprobantePreviewViewModel)] = typeof(Prestamos.ComprobantePreviewView),
             [typeof(DetallePrestamoViewModel)] = typeof(Prestamos.DetallePrestamoView),
             [typeof(SeleccionarPrestamoActivoViewModel)] = typeof(Dashboard.SeleccionarPrestamoActivoView),
+            [typeof(PasswordRecoveryViewModel)] = typeof(PasswordRecovery.PasswordRecoveryView),
         }));
-
-#if DEBUG
-        // Solo en builds DEBUG -- ver el comentario XML de DevPasswordSeeder.
-        services.AddScoped<DevPasswordSeeder>();
-#endif
 
         return services;
     }

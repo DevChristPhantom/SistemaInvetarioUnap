@@ -58,4 +58,6 @@ public class DialogService : IDialogService
         var dialog = new SaveFileDialog { Filter = filter, Title = title, FileName = defaultFileName };
         return dialog.ShowDialog() == true ? dialog.FileName : null;
     }
+
+    public void CopyToClipboard(string text) => Clipboard.SetText(text);
 }

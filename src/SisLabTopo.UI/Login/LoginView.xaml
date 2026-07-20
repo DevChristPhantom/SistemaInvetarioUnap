@@ -72,6 +72,13 @@
                         Click="BtnIngresar_Click"
                         IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"/>
 
+                <Button Content="¿Olvidó su contraseña?"
+                        Style="{StaticResource LinkButtonStyle}"
+                        Command="{Binding AbrirRecuperacionCommand}"
+                        HorizontalAlignment="Center"
+                        Height="26"
+                        Margin="0,14,0,0"/>
+
                 <TextBlock Text="Acceso restringido solo para administradores."
                            Style="{StaticResource SmallStyle}"
                            TextAlignment="Center"

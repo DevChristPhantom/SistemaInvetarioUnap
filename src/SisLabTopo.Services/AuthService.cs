@@ -15,6 +15,14 @@ public class AuthService : IAuthService
     /// <summary>Clave en <c>ConfigEntries</c> donde se guarda el nombre para mostrar del administrador.</summary>
     public const string ClaveNombreAdmin = "admin.nombre";
 
+    /// <summary>
+    /// Clave en <c>ConfigEntries</c> donde se guarda el hash BCrypt del código de
+    /// recuperación vigente (Fase 6). El código en texto plano NUNCA se persiste -- solo
+    /// existe en memoria durante el asistente de primer arranque / el flujo de
+    /// recuperación, el tiempo justo para mostrarlo una vez al administrador.
+    /// </summary>
+    public const string ClaveHashCodigoRecuperacion = "admin.recovery.codigo.hash";
+
     private const int CostoBCrypt = 12;
     private const int MaxIntentosFallidos = 3;
     private const int SegundosBloqueo = 30;
@@ -156,6 +164,132 @@ public class AuthService : IAuthService
         appState.IntentosFallidos = 0;
         appState.HoraBloqueoUtc = null;
         await _context.SaveChangesAsync(ct);
+    }
+
+    public async Task<bool> ExisteContrasenaConfiguradaAsync(CancellationToken ct = default)
+    {
+        var hash = await _configRepo.ObtenerConfigAsync(ClaveHashContrasena, ct);
+        return !string.IsNullOrEmpty(hash);
+    }
+
+    public async Task<string> ConfigurarContrasenaInicialAsync(char[] nuevaContrasena, CancellationToken ct = default)
+    {
+        try
+        {
+            if (nuevaContrasena is null || nuevaContrasena.Length < 6)
+            {
+                throw new Domain.Exceptions.ServiceException(
+                    Domain.Exceptions.ErrorCode.ContrasenaDebil,
+                    "La contraseña debe tener al menos 6 caracteres.");
+            }
+
+            var hashExistente = await _configRepo.ObtenerConfigAsync(ClaveHashContrasena, ct);
+            if (!string.IsNullOrEmpty(hashExistente))
+            {
+                throw new Domain.Exceptions.ServiceException(
+                    Domain.Exceptions.ErrorCode.ContrasenaYaConfigurada,
+                    "Ya existe una contraseña de administrador configurada.");
+            }
+
+            var hashContrasena = BCrypt.Net.BCrypt.HashPassword(new string(nuevaContrasena), workFactor: CostoBCrypt);
+            await _configRepo.GuardarConfigAsync(ClaveHashContrasena, hashContrasena, ct);
+
+            var codigoRecuperacion = GenerarCodigoRecuperacion();
+            var hashCodigo = BCrypt.Net.BCrypt.HashPassword(codigoRecuperacion, workFactor: CostoBCrypt);
+            await _configRepo.GuardarConfigAsync(ClaveHashCodigoRecuperacion, hashCodigo, ct);
+
+            _logger.LogInformation(
+                "Asistente de primer arranque: contraseña de administrador configurada y código de recuperación generado.");
+            return codigoRecuperacion;
+        }
+        finally
+        {
+            Array.Clear(nuevaContrasena, 0, nuevaContrasena.Length);
+        }
+    }
+
+    public async Task<string> RestablecerContrasenaConCodigoAsync(char[] codigoRecuperacion, char[] nuevaContrasena, CancellationToken ct = default)
+    {
+        try
+        {
+            if (nuevaContrasena is null || nuevaContrasena.Length < 6)
+            {
+                throw new Domain.Exceptions.ServiceException(
+                    Domain.Exceptions.ErrorCode.ContrasenaDebil,
+                    "La nueva contraseña debe tener al menos 6 caracteres.");
+            }
+
+            var hashCodigoActual = await _configRepo.ObtenerConfigAsync(ClaveHashCodigoRecuperacion, ct);
+            var codigoValido = !string.IsNullOrEmpty(hashCodigoActual)
+                && codigoRecuperacion is not null
+                && codigoRecuperacion.Length > 0
+                && BCrypt.Net.BCrypt.Verify(new string(codigoRecuperacion), hashCodigoActual);
+
+            if (!codigoValido)
+            {
+                _logger.LogWarning("Intento de recuperación de contraseña con un código de recuperación inválido.");
+                throw new Domain.Exceptions.ServiceException(
+                    Domain.Exceptions.ErrorCode.CodigoRecuperacionInvalido,
+                    "El código de recuperación ingresado no es válido.");
+            }
+
+            var nuevoHashContrasena = BCrypt.Net.BCrypt.HashPassword(new string(nuevaContrasena), workFactor: CostoBCrypt);
+            await _configRepo.GuardarConfigAsync(ClaveHashContrasena, nuevoHashContrasena, ct);
+
+            // El código usado queda invalidado: se genera y persiste uno nuevo (nunca se
+            // reutiliza el mismo), igual que un código de recuperación de un solo uso.
+            var nuevoCodigo = GenerarCodigoRecuperacion();
+            var nuevoHashCodigo = BCrypt.Net.BCrypt.HashPassword(nuevoCodigo, workFactor: CostoBCrypt);
+            await _configRepo.GuardarConfigAsync(ClaveHashCodigoRecuperacion, nuevoHashCodigo, ct);
+
+            // Quien demuestra poseer el código de recuperación ya demostró ser el
+            // administrador legítimo: no tiene sentido dejar vigente un bloqueo de
+            // intentos fallidos previo.
+            await ResetearIntentosAsync(ct);
+
+            _logger.LogInformation(
+                "Contraseña de administrador restablecida vía código de recuperación. Se generó un nuevo código de recuperación (el anterior queda invalidado).");
+            return nuevoCodigo;
+        }
+        finally
+        {
+            if (codigoRecuperacion is not null)
+            {
+                Array.Clear(codigoRecuperacion, 0, codigoRecuperacion.Length);
+            }
+
+            Array.Clear(nuevaContrasena, 0, nuevaContrasena.Length);
+        }
+    }
+
+    /// <summary>
+    /// Genera un código de recuperación aleatorio criptográficamente seguro, formato
+    /// "XXXX-XXXX-XXXX-XXXX" (16 caracteres + separadores) usando el alfabeto de
+    /// Crockford Base32 (excluye I, L, O, U para evitar ambigüedad visual con 1/0/V) --
+    /// suficientemente largo para no ser adivinable por fuerza bruta, pero razonable de
+    /// transcribir/copiar a mano.
+    /// </summary>
+    private static string GenerarCodigoRecuperacion()
+    {
+        const string alfabeto = "0123456789ABCDEFGHJKMNPQRSTVWXYZ";
+        const int totalCaracteres = 16;
+
+        Span<byte> buffer = stackalloc byte[totalCaracteres];
+        System.Security.Cryptography.RandomNumberGenerator.Fill(buffer);
+
+        var chars = new char[totalCaracteres];
+        for (var i = 0; i < totalCaracteres; i++)
+        {
+            chars[i] = alfabeto[buffer[i] % alfabeto.Length];
+        }
+
+        var grupos = new string[totalCaracteres / 4];
+        for (var g = 0; g < grupos.Length; g++)
+        {
+            grupos[g] = new string(chars, g * 4, 4);
+        }
+
+        return string.Join("-", grupos);
     }
 
     /// <summary>

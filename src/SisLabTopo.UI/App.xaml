@@ -26,6 +26,7 @@
             <!-- Converters de uso global -->
             <BooleanToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
+            <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
             <converters:ViewModelIsTypeConverter x:Key="ViewModelIsTypeConverter"/>
             <converters:EstadoEquipoToBrushConverter x:Key="EstadoEquipoToBrushConverter"/>

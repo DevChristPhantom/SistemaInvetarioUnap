@@ -41,5 +41,21 @@ public enum ErrorCode
     DatosInvalidos,
 
     /// <summary>Java: ARCHIVO_EXCEL_INVALIDO</summary>
-    ArchivoExcelInvalido
+    ArchivoExcelInvalido,
+
+    /// <summary>
+    /// Sin equivalente Java (no existía flujo de recuperación real -- el JOptionPane
+    /// original pedía editar la celda de Excel a mano o borrar la base de datos
+    /// completa). El código de recuperación ingresado no coincide con su hash guardado.
+    /// Fase 6 (endurecimiento de seguridad).
+    /// </summary>
+    CodigoRecuperacionInvalido,
+
+    /// <summary>
+    /// Sin equivalente Java. Se intentó ejecutar el asistente de primer arranque
+    /// (<c>ConfigurarContrasenaInicialAsync</c>) cuando ya existe una contraseña de
+    /// administrador configurada -- guarda de seguridad para no poder re-inicializar
+    /// silenciosamente una cuenta ya existente. Fase 6.
+    /// </summary>
+    ContrasenaYaConfigurada
 }

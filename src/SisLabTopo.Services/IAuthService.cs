@@ -45,4 +45,39 @@ public interface IAuthService
 
     /// <summary>Limpia manualmente el contador de intentos fallidos y cualquier bloqueo vigente.</summary>
     Task ResetearIntentosAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Indica si ya existe un hash de contraseña de administrador configurado. Usado por
+    /// <c>App.OnStartup</c> (Fase 6) para decidir si mostrar el asistente de primer
+    /// arranque (<c>false</c>) o el login normal (<c>true</c>).
+    /// </summary>
+    Task<bool> ExisteContrasenaConfiguradaAsync(CancellationToken ct = default);
+
+    /// <summary>
+    /// Asistente de primer arranque: define la contraseña de administrador inicial y
+    /// genera un código de recuperación nuevo. Solo debe invocarse cuando
+    /// <see cref="ExisteContrasenaConfiguradaAsync"/> es <c>false</c> -- lanza
+    /// <see cref="Domain.Exceptions.ServiceException"/> (<c>ContrasenaYaConfigurada</c>)
+    /// si ya había una contraseña configurada, y (<c>ContrasenaDebil</c>) si
+    /// <paramref name="nuevaContrasena"/> tiene menos de 6 caracteres. Devuelve el código
+    /// de recuperación en texto plano -- ÚNICA vez que existe en memoria fuera de este
+    /// método; solo su hash BCrypt se persiste. Limpia <paramref name="nuevaContrasena"/>
+    /// en memoria antes de retornar.
+    /// </summary>
+    Task<string> ConfigurarContrasenaInicialAsync(char[] nuevaContrasena, CancellationToken ct = default);
+
+    /// <summary>
+    /// Restablece la contraseña de administrador usando el código de recuperación vigente
+    /// (reemplaza el "edite la celda de Excel a mano o borre la base de datos completa"
+    /// de la versión Java): no destruye ningún otro dato (equipos/préstamos/historial
+    /// quedan intactos). Lanza <see cref="Domain.Exceptions.ServiceException"/>
+    /// (<c>CodigoRecuperacionInvalido</c>) si <paramref name="codigoRecuperacion"/> no
+    /// coincide con el hash guardado, o (<c>ContrasenaDebil</c>) si
+    /// <paramref name="nuevaContrasena"/> tiene menos de 6 caracteres -- en ambos casos no
+    /// cambia nada. Si tiene éxito, además de actualizar la contraseña genera y persiste
+    /// un CÓDIGO DE RECUPERACIÓN NUEVO (invalida el anterior) y limpia cualquier bloqueo
+    /// de intentos fallidos vigente. Devuelve el nuevo código en texto plano (única vez
+    /// visible). Limpia ambos buffers en memoria antes de retornar.
+    /// </summary>
+    Task<string> RestablecerContrasenaConCodigoAsync(char[] codigoRecuperacion, char[] nuevaContrasena, CancellationToken ct = default);
 }

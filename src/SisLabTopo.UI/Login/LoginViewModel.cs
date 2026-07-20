@@ -2,7 +2,9 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using SisLabTopo.Services;
+using SisLabTopo.UI.Dialogs;
 using SisLabTopo.UI.Navigation;
+using SisLabTopo.UI.PasswordRecovery;
 using SisLabTopo.UI.Shell;
 
 namespace SisLabTopo.UI.Login;
@@ -28,6 +30,7 @@ public partial class LoginViewModel : ObservableObject
 {
     private readonly IAuthService _authService;
     private readonly INavigationService _navigationService;
+    private readonly IDialogService _dialogService;
     private readonly ILogger<LoginViewModel> _logger;
 
     [ObservableProperty]
@@ -44,10 +47,15 @@ public partial class LoginViewModel : ObservableObject
     [ObservableProperty]
     private long _segundosBloqueo;
 
-    public LoginViewModel(IAuthService authService, INavigationService navigationService, ILogger<LoginViewModel> logger)
+    public LoginViewModel(
+        IAuthService authService,
+        INavigationService navigationService,
+        IDialogService dialogService,
+        ILogger<LoginViewModel> logger)
     {
         _authService = authService;
         _navigationService = navigationService;
+        _dialogService = dialogService;
         _logger = logger;
     }
 
@@ -85,6 +93,22 @@ public partial class LoginViewModel : ObservableObject
         {
             IsBusy = false;
         }
+    }
+
+    /// <summary>
+    /// Abre el diálogo de recuperación de contraseña (Fase 6): reemplaza el enlace
+    /// "¿Olvidó su contraseña?" -- placeholder visual desde la Fase 4, sin cablear a
+    /// ningún flujo real hasta ahora -- por el diálogo real de
+    /// <see cref="PasswordRecoveryViewModel"/>. Se construye directamente con
+    /// <c>new</c> (mismo patrón de todos los diálogos de la Fase 5: ver el comentario
+    /// XML de <see cref="IDialogService"/>), pasándole los mismos servicios que
+    /// <see cref="LoginViewModel"/> ya tiene inyectados.
+    /// </summary>
+    [RelayCommand]
+    private void AbrirRecuperacion()
+    {
+        var recoveryViewModel = new PasswordRecoveryViewModel(_authService, _dialogService);
+        _dialogService.ShowDialog(recoveryViewModel);
     }
 
     /// <summary>

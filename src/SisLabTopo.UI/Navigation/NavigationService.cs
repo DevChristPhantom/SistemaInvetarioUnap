@@ -4,6 +4,7 @@ using Microsoft.Extensions.Logging;
 using SisLabTopo.UI.Dashboard;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Shell;
+using SisLabTopo.UI.Startup;
 
 namespace SisLabTopo.UI.Navigation;
 
@@ -60,6 +61,14 @@ public class NavigationService : INavigationService
             case LoginViewModel loginViewModel:
                 _shellViewModel = null;
                 ShowRootWindow<Login.LoginView>(loginViewModel);
+                break;
+
+            case FirstRunSetupViewModel firstRunSetupViewModel:
+                // Asistente de primer arranque (Fase 6): ventana raíz igual que Login,
+                // mostrada en su lugar únicamente cuando todavía no hay ninguna
+                // contraseña de administrador configurada (ver App.OnStartup).
+                _shellViewModel = null;
+                ShowRootWindow<FirstRunSetupView>(firstRunSetupViewModel);
                 break;
 
             case IShellContentViewModel contentViewModel:

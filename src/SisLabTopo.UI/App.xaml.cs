@@ -86,13 +86,26 @@ public partial class App : Application
             var initializer = services.GetRequiredService<DatabaseInitializer>();
             await initializer.InicializarSiNoExisteAsync();
 
-#if DEBUG
-            var seeder = services.GetRequiredService<DevPasswordSeeder>();
-            await seeder.SembrarSiHaceFaltaAsync();
-#endif
-
+            // Fase 6: ya no existe ningún bypass/contraseña por defecto para poder
+            // ejercitar el login (el DevPasswordSeeder de la Fase 4/5, exclusivo de
+            // builds DEBUG, quedó eliminado por completo). Una base de datos nueva
+            // (sin ningún hash de contraseña de administrador en ConfigEntries) navega
+            // al asistente de primer arranque -- idéntico en DEBUG y en Release -- en
+            // vez de al Login normal; una base de datos que ya tiene una contraseña
+            // configurada (de una sesión anterior, o por haber completado el asistente
+            // recién) va directo al Login, sin volver a mostrar el asistente.
+            var authService = services.GetRequiredService<IAuthService>();
             var navigationService = services.GetRequiredService<INavigationService>();
-            navigationService.NavigateTo<LoginViewModel>();
+
+            if (await authService.ExisteContrasenaConfiguradaAsync())
+            {
+                navigationService.NavigateTo<LoginViewModel>();
+            }
+            else
+            {
+                Log.Warning("No hay ninguna contraseña de administrador configurada todavía: mostrando el asistente de primer arranque.");
+                navigationService.NavigateTo<FirstRunSetupViewModel>();
+            }
         }
         catch (Exception ex)
         {

@@ -1,8 +1,10 @@
 using Microsoft.Extensions.Logging.Abstractions;
 using Moq;
 using SisLabTopo.Services;
+using SisLabTopo.UI.Dialogs;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Navigation;
+using SisLabTopo.UI.PasswordRecovery;
 using SisLabTopo.UI.Shell;
 
 namespace SisLabTopo.UI.Tests;
@@ -21,7 +23,16 @@ public class LoginViewModelTests
         Mock<IAuthService> authService,
         Mock<INavigationService> navigationService)
     {
-        return new LoginViewModel(authService.Object, navigationService.Object, NullLogger<LoginViewModel>.Instance);
+        return CrearViewModel(authService, navigationService, out _);
+    }
+
+    private static LoginViewModel CrearViewModel(
+        Mock<IAuthService> authService,
+        Mock<INavigationService> navigationService,
+        out Mock<IDialogService> dialogService)
+    {
+        dialogService = new Mock<IDialogService>();
+        return new LoginViewModel(authService.Object, navigationService.Object, dialogService.Object, NullLogger<LoginViewModel>.Instance);
     }
 
     [Fact]
@@ -135,5 +146,20 @@ public class LoginViewModelTests
         Assert.False(vm.IsLocked);
         Assert.Equal(string.Empty, vm.ErrorMessage);
         Assert.True(vm.IniciarSesionCommand.CanExecute(Pwd("x")));
+    }
+
+    [Fact]
+    public void AbrirRecuperacion_MuestraElDialogoDeRecuperacionDeContrasena()
+    {
+        // Fase 6: el enlace "¿Olvidó su contraseña?" (placeholder visual sin cablear
+        // desde la Fase 4) ahora debe abrir el diálogo real de recuperación en vez de no
+        // hacer nada.
+        var authService = new Mock<IAuthService>();
+        var navigationService = new Mock<INavigationService>();
+        var vm = CrearViewModel(authService, navigationService, out var dialogService);
+
+        vm.AbrirRecuperacionCommand.Execute(null);
+
+        dialogService.Verify(d => d.ShowDialog(It.IsAny<PasswordRecoveryViewModel>()), Times.Once);
     }
 }

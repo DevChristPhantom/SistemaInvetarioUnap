@@ -159,4 +159,181 @@ public class AuthServiceTests : ServicesSqliteTestBase
         var otraInstancia = CrearServicio();
         Assert.True(await otraInstancia.VerificarContrasenaAsync(nueva.ToCharArray()));
     }
+
+    // ===================== Fase 6: asistente de primer arranque =====================
+
+    [Fact]
+    public async Task ExisteContrasenaConfigurada_EsFalse_EnBaseDeDatosNueva()
+    {
+        var service = CrearServicio();
+
+        Assert.False(await service.ExisteContrasenaConfiguradaAsync());
+    }
+
+    [Fact]
+    public async Task ExisteContrasenaConfigurada_EsTrue_DespuesDeConfigurarContrasenaInicial()
+    {
+        var service = CrearServicio();
+
+        await service.ConfigurarContrasenaInicialAsync("Primera-Clave-123".ToCharArray());
+
+        Assert.True(await service.ExisteContrasenaConfiguradaAsync());
+    }
+
+    [Fact]
+    public async Task ConfigurarContrasenaInicial_DeberiaFallar_CuandoLaContrasenaEsDebil()
+    {
+        var service = CrearServicio();
+
+        var ex = await Assert.ThrowsAsync<SisLabTopo.Domain.Exceptions.ServiceException>(() =>
+            service.ConfigurarContrasenaInicialAsync("abc".ToCharArray()));
+
+        Assert.Equal(SisLabTopo.Domain.Exceptions.ErrorCode.ContrasenaDebil, ex.Code);
+        Assert.False(await service.ExisteContrasenaConfiguradaAsync());
+    }
+
+    [Fact]
+    public async Task ConfigurarContrasenaInicial_DeberiaFallar_CuandoYaHayUnaContrasenaConfigurada()
+    {
+        var service = await CrearServicioConContrasenaSembradaAsync();
+
+        var ex = await Assert.ThrowsAsync<SisLabTopo.Domain.Exceptions.ServiceException>(() =>
+            service.ConfigurarContrasenaInicialAsync("Otra-Clave-Cualquiera".ToCharArray()));
+
+        Assert.Equal(SisLabTopo.Domain.Exceptions.ErrorCode.ContrasenaYaConfigurada, ex.Code);
+    }
+
+    [Fact]
+    public async Task ConfigurarContrasenaInicial_GeneraCodigoDeRecuperacionYPermiteLoginConLaNuevaContrasena()
+    {
+        var service = CrearServicio();
+        const string nueva = "Clave-Primer-Arranque-9";
+
+        var codigo = await service.ConfigurarContrasenaInicialAsync(nueva.ToCharArray());
+
+        Assert.False(string.IsNullOrWhiteSpace(codigo));
+        Assert.Matches(@"^[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}-[0-9A-Z]{4}$", codigo);
+        // El alfabeto Crockford Base32 elegido no debe incluir caracteres ambiguos.
+        Assert.DoesNotContain('I', codigo);
+        Assert.DoesNotContain('L', codigo);
+        Assert.DoesNotContain('O', codigo);
+        Assert.DoesNotContain('U', codigo);
+
+        var otraInstancia = CrearServicio();
+        Assert.True(await otraInstancia.VerificarContrasenaAsync(nueva.ToCharArray()));
+    }
+
+    // ===================== Fase 6: recuperación de contraseña =====================
+
+    [Fact]
+    public async Task RestablecerContrasenaConCodigo_CodigoCorrecto_CambiaContrasenaYPreservaOtrosDatos()
+    {
+        var seedContext = CreateContext();
+        _contexts.Add(seedContext);
+        var equipoRepo = CreateEquipoRepo(seedContext);
+        var configRepo = CreatePrestamoRepo(seedContext);
+
+        var equipo = new SisLabTopo.Domain.Models.Equipo
+        {
+            Codigo = "EQ-FASE6-001",
+            Denominacion = "Estación Total de Prueba",
+            Disponible = true,
+            FechaRegistro = DateTime.UtcNow,
+        };
+        await equipoRepo.GuardarAsync(equipo);
+        await configRepo.GuardarConfigAsync(AuthService.ClaveNombreAdmin, "Ing. Prueba");
+
+        var servicioInicial = new AuthService(configRepo, seedContext, Microsoft.Extensions.Logging.Abstractions.NullLogger<AuthService>.Instance);
+        var codigoOriginal = await servicioInicial.ConfigurarContrasenaInicialAsync("Clave-Original-123".ToCharArray());
+
+        var service = CrearServicio();
+        const string nuevaContrasena = "Clave-Restablecida-456";
+
+        var nuevoCodigo = await service.RestablecerContrasenaConCodigoAsync(codigoOriginal.ToCharArray(), nuevaContrasena.ToCharArray());
+
+        Assert.False(string.IsNullOrWhiteSpace(nuevoCodigo));
+
+        var otraInstancia = CrearServicio();
+        Assert.True(await otraInstancia.VerificarContrasenaAsync(nuevaContrasena.ToCharArray()));
+
+        // El resto de los datos (equipos, config del nombre de admin) queda intacto --
+        // a diferencia del "borre toda la base de datos" de la versión Java.
+        var contextoVerificacion = CreateContext();
+        _contexts.Add(contextoVerificacion);
+        var equipoTrasReset = await CreateEquipoRepo(contextoVerificacion).BuscarPorCodigoAsync("EQ-FASE6-001");
+        Assert.NotNull(equipoTrasReset);
+        Assert.Equal("Estación Total de Prueba", equipoTrasReset!.Denominacion);
+
+        var nombreAdminTrasReset = await CreatePrestamoRepo(contextoVerificacion).ObtenerConfigAsync(AuthService.ClaveNombreAdmin);
+        Assert.Equal("Ing. Prueba", nombreAdminTrasReset);
+    }
+
+    [Fact]
+    public async Task RestablecerContrasenaConCodigo_CodigoIncorrecto_NoCambiaNada()
+    {
+        var service = CrearServicio();
+        var codigoOriginal = await service.ConfigurarContrasenaInicialAsync("Clave-Original-Segura".ToCharArray());
+
+        var ex = await Assert.ThrowsAsync<SisLabTopo.Domain.Exceptions.ServiceException>(() =>
+            service.RestablecerContrasenaConCodigoAsync("CODIGO-FALSO-0000".ToCharArray(), "Clave-Que-No-Deberia-Aplicarse".ToCharArray()));
+
+        Assert.Equal(SisLabTopo.Domain.Exceptions.ErrorCode.CodigoRecuperacionInvalido, ex.Code);
+
+        // La contraseña original sigue siendo válida; la "nueva" que se intentó
+        // establecer con el código incorrecto NO debe funcionar.
+        var otraInstancia = CrearServicio();
+        Assert.True(await otraInstancia.VerificarContrasenaAsync("Clave-Original-Segura".ToCharArray()));
+
+        var terceraInstancia = CrearServicio();
+        Assert.False(await terceraInstancia.VerificarContrasenaAsync("Clave-Que-No-Deberia-Aplicarse".ToCharArray()));
+
+        // El código original sigue vigente (no se invalidó por el intento fallido).
+        var cuartaInstancia = CrearServicio();
+        var nuevoCodigoConOriginal = await cuartaInstancia.RestablecerContrasenaConCodigoAsync(
+            codigoOriginal.ToCharArray(), "Otra-Clave-Distinta-789".ToCharArray());
+        Assert.False(string.IsNullOrWhiteSpace(nuevoCodigoConOriginal));
+    }
+
+    [Fact]
+    public async Task RestablecerContrasenaConCodigo_DeberiaFallar_CuandoLaNuevaContrasenaEsDebil()
+    {
+        var service = CrearServicio();
+        var codigoOriginal = await service.ConfigurarContrasenaInicialAsync("Clave-Original-Segura".ToCharArray());
+
+        var otraInstancia = CrearServicio();
+        var ex = await Assert.ThrowsAsync<SisLabTopo.Domain.Exceptions.ServiceException>(() =>
+            otraInstancia.RestablecerContrasenaConCodigoAsync(codigoOriginal.ToCharArray(), "abc".ToCharArray()));
+
+        Assert.Equal(SisLabTopo.Domain.Exceptions.ErrorCode.ContrasenaDebil, ex.Code);
+
+        // Contraseña original sigue vigente.
+        var terceraInstancia = CrearServicio();
+        Assert.True(await terceraInstancia.VerificarContrasenaAsync("Clave-Original-Segura".ToCharArray()));
+    }
+
+    [Fact]
+    public async Task RestablecerContrasenaConCodigo_GeneraUnCodigoNuevoDistintoDelAnterior_YElAnteriorYaNoSirve()
+    {
+        var service = CrearServicio();
+        var codigoOriginal = await service.ConfigurarContrasenaInicialAsync("Clave-Original-Segura".ToCharArray());
+
+        var instanciaReset = CrearServicio();
+        var codigoNuevo = await instanciaReset.RestablecerContrasenaConCodigoAsync(
+            codigoOriginal.ToCharArray(), "Clave-Tras-Reset-111".ToCharArray());
+
+        Assert.NotEqual(codigoOriginal, codigoNuevo);
+
+        // El código ANTERIOR ya no debe servir para un segundo restablecimiento.
+        var instanciaIntentoConCodigoViejo = CrearServicio();
+        var exConCodigoViejo = await Assert.ThrowsAsync<SisLabTopo.Domain.Exceptions.ServiceException>(() =>
+            instanciaIntentoConCodigoViejo.RestablecerContrasenaConCodigoAsync(
+                codigoOriginal.ToCharArray(), "Clave-Que-No-Deberia-Aplicar-222".ToCharArray()));
+        Assert.Equal(SisLabTopo.Domain.Exceptions.ErrorCode.CodigoRecuperacionInvalido, exConCodigoViejo.Code);
+
+        // El código NUEVO sí debe funcionar.
+        var instanciaConCodigoNuevo = CrearServicio();
+        var codigoFinal = await instanciaConCodigoNuevo.RestablecerContrasenaConCodigoAsync(
+            codigoNuevo.ToCharArray(), "Clave-Tras-Segundo-Reset-333".ToCharArray());
+        Assert.False(string.IsNullOrWhiteSpace(codigoFinal));
+    }
 }
