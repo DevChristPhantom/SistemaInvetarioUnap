@@ -3,7 +3,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:local="clr-namespace:SisLabTopo.UI"
              xmlns:converters="clr-namespace:SisLabTopo.UI.Converters"
-             xmlns:shell="clr-namespace:SisLabTopo.UI.Shell">
+             xmlns:shell="clr-namespace:SisLabTopo.UI.Shell"
+             xmlns:equipos="clr-namespace:SisLabTopo.UI.Equipos"
+             xmlns:prestamos="clr-namespace:SisLabTopo.UI.Prestamos">
     <!--
         Nota de arranque: esta app YA NO usa StartupUri (que crearía MainWindow
         automáticamente antes de que el host de DI de App.xaml.cs esté listo). El
@@ -26,6 +28,7 @@
             <converters:ViewModelIsTypeConverter x:Key="ViewModelIsTypeConverter"/>
             <converters:EstadoEquipoToBrushConverter x:Key="EstadoEquipoToBrushConverter"/>
             <converters:EstadoEquipoToTextConverter x:Key="EstadoEquipoToTextConverter"/>
+            <converters:TipoEquipoToTextConverter x:Key="TipoEquipoToTextConverter"/>
             <converters:EstadoPrestamoToBrushConverter x:Key="EstadoPrestamoToBrushConverter"/>
             <converters:EstadoPrestamoToTextConverter x:Key="EstadoPrestamoToTextConverter"/>
             <converters:DisponibilidadToBrushConverter x:Key="DisponibilidadToBrushConverter"/>
@@ -41,6 +44,14 @@
             -->
             <DataTemplate DataType="{x:Type shell:PlaceholderViewModel}">
                 <shell:PlaceholderView/>
+            </DataTemplate>
+
+            <!-- Fase 5: Equipos y Préstamos ya tienen su vista real (reemplazan su PlaceholderViewModel anterior). -->
+            <DataTemplate DataType="{x:Type equipos:EquiposViewModel}">
+                <equipos:EquiposView/>
+            </DataTemplate>
+            <DataTemplate DataType="{x:Type prestamos:PrestamosViewModel}">
+                <prestamos:PrestamosView/>
             </DataTemplate>
         </ResourceDictionary>
     </Application.Resources>

@@ -2,8 +2,10 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Microsoft.Extensions.Logging;
 using SisLabTopo.Services;
+using SisLabTopo.UI.Equipos;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Navigation;
+using SisLabTopo.UI.Prestamos;
 
 namespace SisLabTopo.UI.Shell;
 

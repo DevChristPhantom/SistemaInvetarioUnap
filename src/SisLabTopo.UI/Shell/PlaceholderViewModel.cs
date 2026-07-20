@@ -28,13 +28,10 @@ public sealed class DashboardViewModel() : PlaceholderViewModel("Dashboard")
 {
 }
 
-public sealed class EquiposViewModel() : PlaceholderViewModel("Equipos")
-{
-}
-
-public sealed class PrestamosViewModel() : PlaceholderViewModel("Préstamos Activos")
-{
-}
+// EquiposViewModel y PrestamosViewModel dejaron de ser placeholders en la Fase 5:
+// ahora son los ViewModels reales en SisLabTopo.UI.Equipos/SisLabTopo.UI.Prestamos
+// (ver EquiposView/EquiposViewModel y PrestamosView/PrestamosViewModel). Dashboard/
+// Historial/Configuración siguen pendientes de la fase siguiente y quedan aquí.
 
 public sealed class HistorialViewModel() : PlaceholderViewModel("Historial")
 {

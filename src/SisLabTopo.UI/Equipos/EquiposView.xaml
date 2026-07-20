@@ -1,0 +1,87 @@
+<UserControl x:Class="SisLabTopo.UI.Equipos.EquiposView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:controls="clr-namespace:SisLabTopo.UI.Controls"
+             xmlns:equipos="clr-namespace:SisLabTopo.UI.Equipos"
+             mc:Ignorable="d"
+             d:DataContext="{d:DesignInstance Type=equipos:EquiposViewModel}"
+             d:DesignWidth="1000" d:DesignHeight="600">
+    <!--
+        Puerto funcional de EquiposPanel.java: barra de filtros + acciones CRUD/Excel
+        (Card blanca redondeada) arriba, tabla buscable abajo. Todo controlado por
+        IsBusy (deshabilita filtros/botones mientras carga, importa o exporta: Java
+        bloqueaba la UI entera durante estas operaciones).
+    -->
+    <Grid Background="{StaticResource BackgroundBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!-- Barra de herramientas -->
+        <controls:RoundedCard Grid.Row="0" Margin="0,0,0,16" Padding="18,12">
+            <Grid IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="Estado:" Style="{StaticResource BodyStyle}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox Width="170"
+                              ItemsSource="{Binding OpcionesEstado}"
+                              DisplayMemberPath="Etiqueta"
+                              SelectedItem="{Binding EstadoSeleccionado}"
+                              Margin="0,0,20,0"/>
+
+                    <TextBlock Text="Categoría:" Style="{StaticResource BodyStyle}" FontWeight="Bold" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                    <ComboBox Width="190"
+                              ItemsSource="{Binding OpcionesTipo}"
+                              DisplayMemberPath="Etiqueta"
+                              SelectedItem="{Binding TipoSeleccionado}"/>
+                </StackPanel>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="Nuevo Equipo" Command="{Binding NuevoCommand}" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Editar" Command="{Binding EditarCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Eliminar" Command="{Binding EliminarCommand}" Style="{StaticResource DangerButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Importar Excel" Command="{Binding ImportarExcelCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Content="Exportar Excel" Command="{Binding ExportarExcelCommand}" Style="{StaticResource SecondaryButtonStyle}"/>
+                </StackPanel>
+            </Grid>
+        </controls:RoundedCard>
+
+        <!-- Tabla -->
+        <controls:SearchableDataGrid x:Name="TablaEquipos"
+                                      Grid.Row="1"
+                                      IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}"
+                                      ItemsSource="{Binding Equipos}"
+                                      SelectedItem="{Binding EquipoSeleccionado, Mode=TwoWay}">
+            <controls:SearchableDataGrid.Columns>
+                <DataGridTextColumn Header="Código" Binding="{Binding Codigo}" Width="110"/>
+                <DataGridTextColumn Header="Denominación" Binding="{Binding Denominacion}" Width="*"/>
+                <DataGridTextColumn Header="Marca" Binding="{Binding Marca}" Width="120"/>
+                <DataGridTextColumn Header="Modelo" Binding="{Binding Modelo}" Width="120"/>
+                <DataGridTextColumn Header="Serie" Binding="{Binding Serie}" Width="120"/>
+                <DataGridTemplateColumn Header="Estado" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <controls:StatusBadge BadgeText="{Binding Estado, Converter={StaticResource EstadoEquipoToTextConverter}}"
+                                                   BadgeBrush="{Binding Estado, Converter={StaticResource EstadoEquipoToBrushConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+                <DataGridTemplateColumn Header="Disponible" Width="120">
+                    <DataGridTemplateColumn.CellTemplate>
+                        <DataTemplate>
+                            <controls:StatusBadge BadgeText="{Binding Disponible, Converter={StaticResource DisponibilidadToTextConverter}}"
+                                                   BadgeBrush="{Binding Disponible, Converter={StaticResource DisponibilidadToBrushConverter}}"/>
+                        </DataTemplate>
+                    </DataGridTemplateColumn.CellTemplate>
+                </DataGridTemplateColumn>
+            </controls:SearchableDataGrid.Columns>
+        </controls:SearchableDataGrid>
+    </Grid>
+</UserControl>

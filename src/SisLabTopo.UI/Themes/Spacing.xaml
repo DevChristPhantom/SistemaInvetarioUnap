@@ -14,9 +14,27 @@
             fija en Thickness(16) y es de uso obligatorio para toda tarjeta/panel.
     -->
 
-    <sys:Double x:Key="SidebarWidth">245</sys:Double>
-    <sys:Double x:Key="TopBarHeight">62</sys:Double>
-    <sys:Double x:Key="StatusBarHeight">34</sys:Double>
+    <!--
+        GridLength (no sys:Double): ShellView.xaml los asigna a ColumnDefinition.Width/
+        RowDefinition.Height, que son de tipo GridLength. Bug real encontrado en la
+        verificación visual de la Fase 5 (no introducido por ella: viene de la Fase 4,
+        pero nunca se había completado un login -> Shell real hasta ahora, así que nunca
+        se había disparado): un StaticResource devuelve el objeto boxeado tal cual
+        (aquí antes un System.Double), sin pasar por el TypeConverter de cadena a
+        GridLength que sí se aplica cuando el XAML trae un literal de texto: WPF
+        rechaza esa asignación en tiempo de ejecución con
+        System.ArgumentException: "245" no es un valor válido para la propiedad
+        "Width", envuelto en un XamlParseException que tumbaba el proceso completo (sin
+        excepción visible en el log de Serilog, solo un evento de Windows Error
+        Reporting) justo al construir ShellView tras un login exitoso. Declarar el
+        recurso ya como GridLength (su TypeConverter interpreta "245" directamente al
+        cargar este ResourceDictionary) hace que el tipo coincida exactamente donde se
+        consume. No se usan en ningún otro contexto (double puro) en el resto de la
+        app, así que el cambio de tipo es seguro.
+    -->
+    <GridLength x:Key="SidebarWidth">245</GridLength>
+    <GridLength x:Key="TopBarHeight">62</GridLength>
+    <GridLength x:Key="StatusBarHeight">34</GridLength>
     <sys:Double x:Key="CardRadius">12</sys:Double>
     <sys:Double x:Key="GapSmall">8</sys:Double>
     <sys:Double x:Key="GapMedium">16</sys:Double>

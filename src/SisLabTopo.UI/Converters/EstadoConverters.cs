@@ -45,6 +45,25 @@ public sealed class EstadoEquipoToTextConverter : IValueConverter
 }
 
 /// <summary>
+/// <see cref="TipoEquipo"/> -&gt; etiqueta en español (idéntico a <c>Etiqueta()</c>).
+/// Necesario para cualquier <c>ComboBox</c>/<c>ItemsControl</c> que liste
+/// <see cref="TipoEquipo"/> directamente (p.ej. el combo "Categoría" de
+/// <c>EquipoFormView</c>): <c>Etiqueta()</c> es un método de extensión, no una
+/// propiedad, así que <c>DisplayMemberPath</c> no puede resolverlo por sí solo -- sin
+/// este converter, WPF cae a <c>ToString()</c> y muestra el nombre crudo del enum en
+/// PascalCase (p.ej. "EstacionTotal", "NivelTopografico") en vez de la etiqueta en
+/// español (bug real encontrado en la verificación visual de la Fase 5).
+/// </summary>
+public sealed class TipoEquipoToTextConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is TipoEquipo tipo ? tipo.Etiqueta() : string.Empty;
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}
+
+/// <summary>
 /// <see cref="EstadoPrestamo"/> -&gt; color. A diferencia de <see cref="EstadoEquipo"/>,
 /// el dominio no define colores para este enum (Java tampoco lo hacía); se fija aquí,
 /// como decisión de la capa de UI, un mapeo coherente con la paleta general: Activo en

@@ -1,6 +1,9 @@
 using Microsoft.Extensions.DependencyInjection;
+using SisLabTopo.UI.Dialogs;
+using SisLabTopo.UI.Equipos;
 using SisLabTopo.UI.Login;
 using SisLabTopo.UI.Navigation;
+using SisLabTopo.UI.Prestamos;
 using SisLabTopo.UI.Shell;
 
 namespace SisLabTopo.UI.Startup;
@@ -39,12 +42,35 @@ public static class ServiceRegistration
         services.AddScoped<LoginViewModel>();
         services.AddScoped<ShellViewModel>();
 
-        // ViewModels de contenido del Shell (Fase 4: placeholders; Fase 5: reales, mismo registro)
+        // ViewModels de contenido del Shell (Fase 4: placeholders; Fase 5: Equipos y
+        // Préstamos ya son reales -- Dashboard/Historial/Configuración siguen
+        // pendientes de la fase siguiente).
         services.AddTransient<DashboardViewModel>();
         services.AddTransient<EquiposViewModel>();
         services.AddTransient<PrestamosViewModel>();
         services.AddTransient<HistorialViewModel>();
         services.AddTransient<ConfiguracionViewModel>();
+
+        // Diálogos de Fase 5 (ver comentario XML de IDialogService sobre el patrón
+        // elegido): las ventanas se registran en DI para que DialogService pueda
+        // resolverlas; sus ViewModels los construye directamente quien abre el
+        // diálogo (nunca el contenedor), así que NO se registran aquí.
+        services.AddTransient<Equipos.EquipoFormView>();
+        services.AddTransient<Prestamos.NuevoPrestamoView>();
+        services.AddTransient<Prestamos.EquipoSearchView>();
+        services.AddTransient<Prestamos.DevolucionView>();
+        services.AddTransient<Prestamos.ComprobantePreviewView>();
+        services.AddTransient<Prestamos.DetallePrestamoView>();
+
+        services.AddSingleton<IDialogService>(sp => new DialogService(sp, new Dictionary<Type, Type>
+        {
+            [typeof(EquipoFormViewModel)] = typeof(Equipos.EquipoFormView),
+            [typeof(NuevoPrestamoViewModel)] = typeof(Prestamos.NuevoPrestamoView),
+            [typeof(EquipoSearchViewModel)] = typeof(Prestamos.EquipoSearchView),
+            [typeof(DevolucionViewModel)] = typeof(Prestamos.DevolucionView),
+            [typeof(ComprobantePreviewViewModel)] = typeof(Prestamos.ComprobantePreviewView),
+            [typeof(DetallePrestamoViewModel)] = typeof(Prestamos.DetallePrestamoView),
+        }));
 
 #if DEBUG
         // Solo en builds DEBUG -- ver el comentario XML de DevPasswordSeeder.

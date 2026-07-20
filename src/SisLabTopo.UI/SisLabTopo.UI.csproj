@@ -11,6 +11,7 @@
     <PackageReference Include="BCrypt.Net-Next" Version="4.2.0" />
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.2" />
     <PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.10" />
+    <PackageReference Include="PDFtoImage" Version="5.1.0" />
     <PackageReference Include="Serilog.Extensions.Hosting" Version="10.0.0" />
     <PackageReference Include="Serilog.Sinks.Debug" Version="3.0.0" />
     <PackageReference Include="Serilog.Sinks.File" Version="7.0.0" />
@@ -25,8 +26,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Resource Include="Assets\Logo_UNAP.png"/>
-    <Resource Include="Assets\Logo_Minas.png"/>
+    <Resource Include="Assets\Logo_UNAP.png" />
+    <Resource Include="Assets\Logo_Minas.png" />
   </ItemGroup>
 
 </Project>
