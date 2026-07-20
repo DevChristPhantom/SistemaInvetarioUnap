@@ -1,4 +1,4 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
+<Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
     <ProjectReference Include="..\SisLabTopo.Domain\SisLabTopo.Domain.csproj" />
@@ -9,5 +9,33 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
+
+  <!--
+    QuestPDF se fija deliberadamente en 2023.12.6 (en vez de la última estable) porque es la
+    última versión que expone el elemento Canvas de bajo nivel respaldado por SkiaSharp
+    (container.Canvas((canvas, size) => ...)). A partir de 2024.3.0, QuestPDF reemplazó
+    SkiaSharp por bindings nativos propios y eliminó ese punto de extensión público, quedando
+    solo el modelo de layout de alto nivel (Row/Column/Text con métricas internas no
+    documentadas). La especificación de este comprobante viene expresada en coordenadas
+    absolutas de PDF (idénticas a las que usaba PDFBox en Java) y requiere posicionamiento de
+    línea base de texto y medición de ancho por fuente bit a bit reproducibles; el Canvas +
+    SkiaSharp permite portar casi literalmente drawRect/drawLine/drawText/drawCentered/
+    recortar desde el Java original. Si en una fase posterior se prioriza estar en la última
+    versión de QuestPDF por otras razones (SVG nativo, subsetting de fuentes, etc.), habría que
+    reescribir esta capa usando el modelo de alto nivel y validar visualmente de nuevo.
+  -->
+  <ItemGroup>
+    <PackageReference Include="QuestPDF" Version="2023.12.6" />
+    <PackageReference Include="SkiaSharp" Version="2.88.7" />
+    <PackageReference Include="Microsoft.Extensions.Logging.Abstractions" Version="10.0.10" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Include="Assets\Logo_UNAP.png" />
+    <EmbeddedResource Include="Assets\Logo_Minas.png" />
+    <EmbeddedResource Include="Assets\Fonts\LiberationSans-Regular.ttf" />
+    <EmbeddedResource Include="Assets\Fonts\LiberationSans-Bold.ttf" />
+    <EmbeddedResource Include="Assets\Fonts\LiberationSans-Italic.ttf" />
+  </ItemGroup>
 
 </Project>

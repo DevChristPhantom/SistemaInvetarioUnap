@@ -12,6 +12,13 @@
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.14.1" />
     <PackageReference Include="xunit" Version="2.9.3" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.1.4" />
+    <!--
+      El paquete histórico "UglyToad.PdfPig" quedó huérfano en NuGet (versión estable
+      inexistente, solo una prerelease "1.7.0-custom-5" publicada por un owner distinto al
+      del proyecto original). La librería activa y mantenida por el mismo equipo/repositorio
+      GitHub (UglyToad/PdfPig) se publica hoy bajo el id "PdfPig" a secas — se usa esa.
+    -->
+    <PackageReference Include="PdfPig" Version="0.1.15" />
   </ItemGroup>
 
   <ItemGroup>
