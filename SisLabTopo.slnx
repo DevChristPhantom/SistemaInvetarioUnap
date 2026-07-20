@@ -1,0 +1,15 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/SisLabTopo.Services/SisLabTopo.Services.csproj" />
+    <Project Path="src/SisLabTopo.Data/SisLabTopo.Data.csproj" />
+    <Project Path="src/SisLabTopo.Domain/SisLabTopo.Domain.csproj" />
+    <Project Path="src/SisLabTopo.Reports/SisLabTopo.Reports.csproj" />
+    <Project Path="src/SisLabTopo.UI/SisLabTopo.UI.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/SisLabTopo.Services.Tests/SisLabTopo.Services.Tests.csproj" />
+    <Project Path="tests/SisLabTopo.Data.Tests/SisLabTopo.Data.Tests.csproj" />
+    <Project Path="tests/SisLabTopo.Reports.Tests/SisLabTopo.Reports.Tests.csproj" />
+    <Project Path="tests/SisLabTopo.UI.Tests/SisLabTopo.UI.Tests.csproj" />
+  </Folder>
+</Solution>

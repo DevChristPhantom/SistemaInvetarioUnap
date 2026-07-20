@@ -1,0 +1,32 @@
+## .NET
+bin/
+obj/
+*.user
+*.suo
+
+## Rider / VS / VS Code
+.vs/
+.vscode/
+.idea/
+*.userosscache
+*.sln.docstates
+
+## Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+publish/
+
+## SQLite runtime data (not source)
+*.db
+*.db-shm
+*.db-wal
+
+## Logs
+*.log
+logs/
+
+## OS
+Thumbs.db
+.DS_Store

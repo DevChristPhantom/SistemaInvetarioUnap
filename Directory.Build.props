@@ -1,0 +1,12 @@
+<Project>
+
+  <PropertyGroup>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <LangVersion>latest</LangVersion>
+    <WarningsAsErrors>nullable</WarningsAsErrors>
+    <GenerateDocumentationFile>false</GenerateDocumentationFile>
+    <InvariantGlobalization>false</InvariantGlobalization>
+  </PropertyGroup>
+
+</Project>
