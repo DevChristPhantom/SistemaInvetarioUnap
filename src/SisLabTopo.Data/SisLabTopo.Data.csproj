@@ -11,6 +11,12 @@
       <PrivateAssets>all</PrivateAssets>
     </PackageReference>
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.10" />
+    <!-- Pin transitivo: NU1903 (CVE-2025-6965) afecta a SQLitePCLRaw.lib.e_sqlite3 <= 2.1.11,
+         que es la version que trae EFCore.Sqlite 10.0.10 (la ultima estable disponible a
+         2026-07). Se fija explicitamente 2.1.12 (ultima version 2.x, sin saltar a la serie
+         3.x que reempaqueta SQLite de forma incompatible con Microsoft.Data.Sqlite 10.0.10)
+         para resolver la vulnerabilidad sin esperar a EFCore 11 (aun en preview). -->
+    <PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="2.1.12" />
   </ItemGroup>
 
   <PropertyGroup>

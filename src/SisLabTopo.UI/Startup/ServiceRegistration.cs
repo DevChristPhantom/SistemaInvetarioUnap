@@ -29,8 +29,11 @@ namespace SisLabTopo.UI.Startup;
 /// <see cref="IServiceScope"/> para toda la vida de la aplicación y resuelve todo desde
 /// ahí (ver <c>App.OnStartup</c>) -- de modo que estos servicios Scoped se comportan,
 /// en la práctica, como si fueran Singleton durante la sesión, sin tener que tocar su
-/// ciclo de vida ya definido en Fase 1/2. Por eso los tipos de esta capa también se
-/// registran aquí como Scoped: así comparten exactamente el mismo scope raíz.
+/// ciclo de vida ya definido en Fase 1/2. <c>NavigationService</c> se registra Scoped
+/// aquí por la misma razón (una única instancia para toda la sesión). Las ventanas raíz
+/// (Login/Shell) y sus ViewModels, en cambio, se registran Transient -- ver el
+/// comentario junto a su registro para la explicación (fix de un crash real encontrado
+/// en la Fase 8 de QA).
 /// </summary>
 public static class ServiceRegistration
 {
@@ -38,24 +41,47 @@ public static class ServiceRegistration
     {
         services.AddScoped<INavigationService, NavigationService>();
 
-        // Ventanas raíz
-        services.AddScoped<LoginView>();
-        services.AddScoped<ShellView>();
+        // Ventanas raíz (Login/Shell): registradas Transient -- NO Scoped -- a propósito.
+        //
+        // Fix de la Fase 8 (QA final): originalmente estaban como Scoped, "para compartir
+        // exactamente el mismo scope raíz" con los servicios Scoped de Data/Services (ver
+        // nota de ciclo de vida más abajo). Eso funciona para servicios, pero un
+        // Window de WPF no es un servicio corriente: una vez que se llama a Close() sobre
+        // él (algo que ShowRootWindow hace deliberadamente con la ventana raíz anterior en
+        // cada navegación) ese objeto Window queda inutilizable para siempre -- WPF lanza
+        // InvalidOperationException ("no se puede llamar a Show... después de haberse
+        // cerrado un elemento Window") si se lo vuelve a mostrar. Con Scoped + un único
+        // scope de por vida de la app, el contenedor de DI devolvía la MISMA instancia de
+        // LoginView/ShellView en cada NavigateTo, así que el primer tránsito Login->Shell
+        // funcionaba (LoginView se cerraba por primera vez), pero el segundo tránsito
+        // Shell->Login (es decir, "Cerrar sesión") pedía de nuevo esa misma instancia ya
+        // cerrada de LoginView y la app moría con una excepción no controlada al invocar
+        // Window.Show(). Se reprodujo de forma real durante el recorrido manual de la
+        // Fase 8 (login -> Dashboard -> Cerrar sesión) y quedó confirmado en el Visor de
+        // Eventos de Windows (.NET Runtime, "process was terminated due to an unhandled
+        // exception"). LoginViewModel/ShellViewModel se cambian también a Transient (ver
+        // más abajo) para evitar además que quede colgado cualquier estado obsoleto de la
+        // sesión anterior (p.ej. un mensaje de error de login previo) en la nueva sesión.
+        services.AddTransient<LoginView>();
+        services.AddTransient<ShellView>();
 
         // Asistente de primer arranque (Fase 6): también es una ventana raíz (sustituye
         // a Login la primera vez que arranca la app, antes de que exista una contraseña
-        // de administrador configurada), pero se registra Transient -- a diferencia de
-        // Login/Shell -- a propósito: solo se usa una vez por la vida de la base de
-        // datos, y no queremos que la instancia (que llegó a tener en memoria el código
-        // de recuperación en texto plano, aunque ya se limpia explícitamente al
-        // continuar) quede cacheada indefinidamente por el resto de la sesión en el
-        // scope raíz de la aplicación.
+        // de administrador configurada), y por la misma razón que Login/Shell arriba se
+        // registra Transient: solo se usa una vez por la vida de la base de datos, y no
+        // queremos que la instancia (que llegó a tener en memoria el código de
+        // recuperación en texto plano, aunque ya se limpia explícitamente al continuar)
+        // quede cacheada indefinidamente por el resto de la sesión en el scope raíz de la
+        // aplicación.
         services.AddTransient<FirstRunSetupView>();
         services.AddTransient<FirstRunSetupViewModel>();
 
-        // ViewModels de ventana raíz
-        services.AddScoped<LoginViewModel>();
-        services.AddScoped<ShellViewModel>();
+        // ViewModels de ventana raíz: Transient por la misma razón que sus Views (ver
+        // comentario arriba) -- ambos dependen únicamente de servicios Scoped/Singleton
+        // que sí siguen viviendo en el único scope raíz de la app, así que no hay ningún
+        // problema en resolver una instancia nueva de ViewModel en cada navegación.
+        services.AddTransient<LoginViewModel>();
+        services.AddTransient<ShellViewModel>();
 
         // ViewModels de contenido del Shell. Fase 5a ya había reemplazado Equipos y
         // Préstamos; esta fase (5b) reemplaza los 3 restantes (Dashboard/Historial/
