@@ -17,6 +17,8 @@ obj/
 x64/
 x86/
 publish/
+dist/
+publish-test/
 
 ## SQLite runtime data (not source)
 *.db

@@ -1,0 +1,8 @@
+Universidad Nacional del Altiplano - Puno
+Facultad de Ingeniería de Minas
+
+Sistema de Gestión del Laboratorio de Topografía Minera (SisLab-Topo)
+
+Copyright (c) 2026 Universidad Nacional del Altiplano. All rights reserved.
+
+El uso, copia, distribución y modificación de este software está limitado exclusivamente al uso institucional dentro de la Facultad de Ingeniería de Minas (FIM) de la Universidad Nacional del Altiplano. Queda prohibida su venta o explotación comercial sin el consentimiento expreso y por escrito de la facultad.
