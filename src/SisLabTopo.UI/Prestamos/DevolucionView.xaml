@@ -10,7 +10,7 @@
         Width="420" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
     <StackPanel Margin="20" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
         <TextBlock Text="¿Confirmar la devolución de los equipos?" Style="{StaticResource BodyStyle}" FontWeight="Bold" TextWrapping="Wrap"/>
         <TextBlock Text="Ingrese el estado físico de recepción o novedades:" Style="{StaticResource BodyStyle}" TextWrapping="Wrap" Margin="0,4,0,10"/>

@@ -169,7 +169,13 @@ public class LoginViewRenderingTests
     /// SIN establecer <c>RenderOptions.ProcessRenderMode</c> aquí -- esa línea vive
     /// únicamente en <c>App.xaml.cs</c> y es exactamente lo que esta prueba vigila.
     /// </summary>
-    private static void AsegurarRecursosDeAplicacion()
+    /// <summary>
+    /// <c>internal</c> (no <c>private</c>) a propósito: <see cref="SearchableDataGridPaginationTests"/>
+    /// reutiliza este mismo arnés de Application/MergedDictionaries en vez de duplicarlo,
+    /// ya que ambas pruebas necesitan exactamente el mismo entorno WPF mínimo fuera de
+    /// <c>App.OnStartup</c>.
+    /// </summary>
+    internal static void AsegurarRecursosDeAplicacion()
     {
         if (Application.Current is not null)
         {
@@ -224,7 +230,8 @@ public class LoginViewRenderingTests
     /// STA. xUnit ejecuta las pruebas en hilos del pool (MTA), así que el cuerpo se
     /// corre en un hilo STA dedicado y se espera su resultado.
     /// </summary>
-    private static T EjecutarEnHiloSta<T>(Func<T> accion)
+    /// <summary><c>internal</c> por el mismo motivo que <see cref="AsegurarRecursosDeAplicacion"/>: reutilizado por <see cref="SearchableDataGridPaginationTests"/>.</summary>
+    internal static T EjecutarEnHiloSta<T>(Func<T> accion)
     {
         T resultado = default!;
         Exception? excepcion = null;

@@ -32,16 +32,24 @@
 
             <controls:StatCard Grid.Column="0" Margin="0,0,8,0"
                                 Title="Total Equipos" Value="{Binding TotalEquiposTexto}" Description="Registrados"
-                                IconGlyph="EQ" IconBrush="{DynamicResource PrimaryBrush}"/>
+                                IconGlyph="EQ" IconBrush="{DynamicResource PrimaryBrush}"
+                                TrendText="{Binding TotalEquiposTrendTexto}" TrendDirection="{Binding TotalEquiposTrendDireccion}"
+                                SparklineValues="{Binding TotalEquiposSparkline}"/>
             <controls:StatCard Grid.Column="1" Margin="8,0,8,0"
                                 Title="Equipos Disponibles" Value="{Binding EquiposDisponiblesTexto}" Description="Listos para préstamo"
-                                IconGlyph="OK" IconBrush="{DynamicResource SuccessBrush}"/>
+                                IconGlyph="OK" IconBrush="{DynamicResource SuccessBrush}"
+                                TrendText="{Binding EquiposDisponiblesTrendTexto}" TrendDirection="{Binding EquiposDisponiblesTrendDireccion}"
+                                SparklineValues="{Binding EquiposDisponiblesSparkline}"/>
             <controls:StatCard Grid.Column="2" Margin="8,0,8,0"
                                 Title="Préstamos Activos" Value="{Binding PrestamosActivosTexto}" Description="Equipos en préstamo"
-                                IconGlyph="PR" IconBrush="{DynamicResource AccentBrush}"/>
+                                IconGlyph="PR" IconBrush="{DynamicResource AccentBrush}"
+                                TrendText="{Binding PrestamosActivosTrendTexto}" TrendDirection="{Binding PrestamosActivosTrendDireccion}"
+                                SparklineValues="{Binding PrestamosActivosSparkline}"/>
             <controls:StatCard Grid.Column="3" Margin="8,0,0,0"
                                 Title="Devoluciones Hoy" Value="{Binding DevolucionesHoyTexto}" Description="Esperando devolución"
-                                IconGlyph="DV">
+                                IconGlyph="DV"
+                                TrendText="{Binding DevolucionesHoyTrendTexto}" TrendDirection="{Binding DevolucionesHoyTrendDireccion}"
+                                SparklineValues="{Binding DevolucionesHoySparkline}">
                 <controls:StatCard.IconBrush>
                     <SolidColorBrush Color="#6f42c1"/>
                 </controls:StatCard.IconBrush>
@@ -78,8 +86,15 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Distribución de Equipos por Estado" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
                             <Grid Grid.Row="1">
-                                <lvc:PieChart Series="{Binding SeriesEstadoEquipos}"
+                                <!--
+                                    LegendTextPaint (gris neutro, contraste aceptable en claro Y oscuro) se
+                                    asigna en DashboardView.xaml.cs, no aquí: SKColor no tiene TypeConverter
+                                    de XAML para "#RRGGBB" (a diferencia de System.Windows.Media.Color).
+                                -->
+                                <lvc:PieChart x:Name="GraficoEstadoEquipos"
+                                              Series="{Binding SeriesEstadoEquipos}"
                                               LegendPosition="Bottom"
+                                              Background="{DynamicResource CardBrush}"
                                               Visibility="{Binding HayDatosGraficoEstado, Converter={StaticResource BoolToVisibilityConverter}}"/>
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
                                             Visibility="{Binding SinDatosGraficoEstado, Converter={StaticResource BoolToVisibilityConverter}}">
@@ -103,7 +118,8 @@
                             <lvc:CartesianChart Grid.Row="1"
                                                  Series="{Binding SeriesPrestamosPorMes}"
                                                  XAxes="{Binding XAxesPrestamosPorMes}"
-                                                 YAxes="{Binding YAxesPrestamosPorMes}"/>
+                                                 YAxes="{Binding YAxesPrestamosPorMes}"
+                                                 Background="{DynamicResource CardBrush}"/>
                         </Grid>
                     </controls:RoundedCard>
                 </Grid>
@@ -115,7 +131,18 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Últimos préstamos activos -->
+                    <!--
+                        Últimos préstamos activos: timeline visual (línea vertical +
+                        puntos + fecha/estudiante/equipo) en vez de la mini-tabla plana
+                        de la Fase 5: "fila 3: timeline" pedida explícitamente para
+                        esta fase. El punto de cada ítem se colorea con el mismo
+                        converter/paleta que cualquier StatusBadge de préstamo (azul
+                        Activo / rojo Vencido), para consistencia visual con el resto de
+                        la app. UltimosPrestamosActivos (la colección plana original)
+                        se mantiene intacta en el ViewModel: este timeline consume la
+                        colección nueva TimelinePrestamosActivos, que envuelve los mismos
+                        5 préstamos con el resumen de equipo(s) prestado(s).
+                    -->
                     <controls:RoundedCard Grid.Column="0" Margin="0,0,8,0">
                         <Grid>
                             <Grid.RowDefinitions>
@@ -124,14 +151,47 @@
                             </Grid.RowDefinitions>
                             <TextBlock Grid.Row="0" Text="Últimos Préstamos Activos" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,8"/>
                             <Grid Grid.Row="1">
-                                <DataGrid ItemsSource="{Binding UltimosPrestamosActivos}"
-                                          Visibility="{Binding HayPrestamosActivosRecientes, Converter={StaticResource BoolToVisibilityConverter}}">
-                                    <DataGrid.Columns>
-                                        <DataGridTextColumn Header="Estudiante" Binding="{Binding NombreEstudiante}" Width="*"/>
-                                        <DataGridTextColumn Header="Curso" Binding="{Binding Curso}" Width="*"/>
-                                        <DataGridTextColumn Header="Fecha" Binding="{Binding FechaPrestamo, StringFormat='dd/MM HH:mm'}" Width="100"/>
-                                    </DataGrid.Columns>
-                                </DataGrid>
+                                <ScrollViewer VerticalScrollBarVisibility="Auto"
+                                              Visibility="{Binding HayPrestamosActivosRecientes, Converter={StaticResource BoolToVisibilityConverter}}">
+                                    <ItemsControl ItemsSource="{Binding TimelinePrestamosActivos}">
+                                        <ItemsControl.ItemTemplate>
+                                            <DataTemplate>
+                                                <Grid Margin="0,0,0,14">
+                                                    <Grid.ColumnDefinitions>
+                                                        <ColumnDefinition Width="22"/>
+                                                        <ColumnDefinition Width="*"/>
+                                                    </Grid.ColumnDefinitions>
+
+                                                    <!-- Línea vertical continua + punto de estado (Activo=azul/Vencido=rojo, igual criterio que StatusBadge) -->
+                                                    <Grid Grid.Column="0">
+                                                        <Rectangle Width="2"
+                                                                   Fill="{DynamicResource BorderLightBrush}"
+                                                                   HorizontalAlignment="Center"
+                                                                   VerticalAlignment="Stretch"
+                                                                   Margin="0,4,0,-14"/>
+                                                        <Ellipse Width="11" Height="11"
+                                                                 HorizontalAlignment="Center" VerticalAlignment="Top"
+                                                                 Stroke="{DynamicResource CardBrush}" StrokeThickness="2"
+                                                                 Fill="{Binding Prestamo.Estado, Converter={StaticResource EstadoPrestamoToBrushConverter}}"/>
+                                                    </Grid>
+
+                                                    <StackPanel Grid.Column="1" Margin="8,0,0,0">
+                                                        <TextBlock Text="{Binding Prestamo.FechaPrestamo, StringFormat='dd/MM/yyyy HH:mm'}"
+                                                                   Style="{StaticResource SmallStyle}"/>
+                                                        <TextBlock Text="{Binding Prestamo.NombreEstudiante}"
+                                                                   Style="{StaticResource BodyStyle}" FontWeight="Bold"
+                                                                   Margin="0,1,0,0"/>
+                                                        <TextBlock Style="{StaticResource SmallStyle}" Margin="0,1,0,0" TextTrimming="CharacterEllipsis">
+                                                            <Run Text="{Binding Prestamo.Curso, Mode=OneWay}"/>
+                                                            <Run Text=" · "/>
+                                                            <Run Text="{Binding EquipoResumen, Mode=OneWay}"/>
+                                                        </TextBlock>
+                                                    </StackPanel>
+                                                </Grid>
+                                            </DataTemplate>
+                                        </ItemsControl.ItemTemplate>
+                                    </ItemsControl>
+                                </ScrollViewer>
                                 <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center"
                                             Visibility="{Binding SinPrestamosActivosRecientes, Converter={StaticResource BoolToVisibilityConverter}}">
                                     <TextBlock Text="No hay préstamos activos." Style="{StaticResource BodyStyle}" FontWeight="Bold" HorizontalAlignment="Center"/>

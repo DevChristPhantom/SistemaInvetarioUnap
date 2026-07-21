@@ -43,6 +43,13 @@
     <Resource Include="Assets\Icons\pagar.png" />
     <Resource Include="Assets\Icons\archivo.png" />
     <Resource Include="Assets\Icons\config.png" />
+
+    <!--
+      Fase B (tablas/botones): mismo criterio: icono heredado 1:1 de Java
+      (sislab-topo\Iconos\boton-editar.png / src\main\resources\images\boton-editar.png),
+      copiado tal cual y usado como OpacityMask (blanco) sobre botones de "Editar".
+    -->
+    <Resource Include="Assets\Icons\boton-editar.png" />
   </ItemGroup>
 
 </Project>

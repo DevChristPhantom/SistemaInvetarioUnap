@@ -9,7 +9,7 @@
         Title="Vista Previa de Comprobante"
         Width="560" Height="720"
         WindowStartupLocation="CenterOwner"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
     <Grid Margin="0,0,0,10">
         <Grid.RowDefinitions>
             <RowDefinition Height="*"/>

@@ -10,7 +10,7 @@
         Width="480" SizeToContent="Height" MaxHeight="600"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
     <StackPanel Margin="24">
         <TextBlock Text="{Binding Prestamo.Id, StringFormat='Préstamo ID: {0}'}" Style="{StaticResource SmallStyle}"/>
         <TextBlock Style="{StaticResource BodyStyle}" Margin="0,8,0,0">

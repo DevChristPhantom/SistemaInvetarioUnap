@@ -44,9 +44,31 @@
                 </StackPanel>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Nuevo Equipo" Command="{Binding NuevoCommand}" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0"/>
-                    <Button Content="Editar" Command="{Binding EditarCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
-                    <Button Content="Eliminar" Command="{Binding EliminarCommand}" Style="{StaticResource DangerButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Command="{Binding NuevoCommand}" Style="{StaticResource PrimaryButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- "+" (glifo Segoe MDL2 Assets, codepoint E710 "Add", estándar de Windows) en vez de un PNG heredado: no existe equivalente 1:1 en los iconos de Java para "agregar". -->
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Nuevo Equipo" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding EditarCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Icono heredado 1:1 de Java (boton-editar.png), mismo criterio de OpacityMask que el sidebar (ver ShellView.xaml): el color real (blanco, igual que el texto del botón) lo pone el propio Rectangle, no el PNG. -->
+                            <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/boton-editar.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Editar" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding EliminarCommand}" Style="{StaticResource DangerButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Papelera (Segoe MDL2 Assets, codepoint E74D "Delete", el otro glifo estándar de Windows). -->
+                            <TextBlock Text="&#xE74D;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Eliminar" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                     <Button Content="Importar Excel" Command="{Binding ImportarExcelCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0"/>
                     <Button Content="Exportar Excel" Command="{Binding ExportarExcelCommand}" Style="{StaticResource SecondaryButtonStyle}"/>
                 </StackPanel>

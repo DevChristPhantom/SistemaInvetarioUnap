@@ -12,11 +12,19 @@
         se dibujan con la fuente "Segoe MDL2 Assets" (incluida en Windows) en vez de
         emojis o PNGs, igual de "sin emojis, vectorial" que el criterio ya usado en
         LoginPanel.java, sin añadir ningún paquete de iconos externo.
+
+        Fase B (rediseño de tablas): paginación en memoria añadida sobre la lista YA
+        filtrada/cargada (ver PageSize/CurrentPage/TotalPages en el code-behind): sin
+        tocar SisLabTopo.Services ni los ViewModels de cada pantalla, para que Equipos/
+        Préstamos/Historial/Disponibilidad Rápida (Dashboard) la reciban gratis al
+        compartir este mismo control. Se usan "‹"/"›" (puntuación Unicode estándar, no
+        una fuente de iconos) para los botones Anterior/Siguiente: cero riesgo de
+        "codepoint" de glifo no verificado, igual de accesible que un glifo real.
     -->
     <DockPanel LastChildFill="True">
         <Border DockPanel.Dock="Top"
                 Margin="0,0,0,10"
-                Background="White"
+                Background="{DynamicResource CardBrush}"
                 BorderBrush="{DynamicResource BorderLightBrush}"
                 BorderThickness="1"
                 CornerRadius="{StaticResource TextBoxCornerRadius}">
@@ -56,8 +64,48 @@
             </Grid>
         </Border>
 
+        <!--
+            Barra de paginación: solo visible cuando hay más resultados filtrados que
+            PageSize (ShowPagination, calculado en el code-behind). Docked Bottom ANTES
+            que el DataGrid para que este último siga siendo el "último hijo" que llena
+            el espacio restante (DockPanel.LastChildFill).
+        -->
+        <Border DockPanel.Dock="Bottom"
+                Margin="0,10,0,0"
+                Padding="4,0"
+                Visibility="{Binding ShowPagination, RelativeSource={RelativeSource AncestorType=UserControl}, Converter={StaticResource BoolToVisibilityConverter}}">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <TextBlock Grid.Column="0"
+                           Text="{Binding PageInfoText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                           Style="{StaticResource SmallStyle}"
+                           VerticalAlignment="Center"/>
+
+                <StackPanel Grid.Column="1" Orientation="Horizontal">
+                    <Button Content="‹ Anterior"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Padding="12,6"
+                            FontSize="12"
+                            Margin="0,0,8,0"
+                            IsEnabled="{Binding CanGoPrevious, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Click="PreviousPageButton_Click"/>
+                    <Button Content="Siguiente ›"
+                            Style="{StaticResource SecondaryButtonStyle}"
+                            Padding="12,6"
+                            FontSize="12"
+                            IsEnabled="{Binding CanGoNext, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                            Click="NextPageButton_Click"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+
         <DataGrid x:Name="PART_DataGrid"
                   DockPanel.Dock="Bottom"
+                  CanUserSortColumns="False"
                   SelectionChanged="InnerDataGrid_SelectionChanged"/>
     </DockPanel>
 </UserControl>

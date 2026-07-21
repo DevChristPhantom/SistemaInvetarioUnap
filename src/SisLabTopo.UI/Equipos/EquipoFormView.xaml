@@ -10,7 +10,7 @@
         Width="460" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
     <StackPanel Margin="24" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
 
         <TextBlock Text="Código Patrimonial:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>

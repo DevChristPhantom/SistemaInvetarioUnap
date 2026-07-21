@@ -5,49 +5,147 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:controls="clr-namespace:SisLabTopo.UI.Controls"
              mc:Ignorable="d"
-             d:DesignWidth="240" d:DesignHeight="90">
+             d:DesignWidth="240" d:DesignHeight="110">
     <!--
         Tarjeta de estadística del dashboard: icono circular (badge de color) a la
         izquierda + stack de texto (título pequeño gris / valor grande 22pt negrita
-        oscuro / descripción pequeña gris) a la derecha. Usada por el Dashboard real en
-        la Fase 5; aquí solo se define el control reutilizable.
+        oscuro / descripción pequeña gris) a la derecha: fila 1 tal cual la definió la
+        Fase 5.
+
+        Fase B (rediseño, fila 1 del Dashboard): se añade una segunda fila OPCIONAL con
+        comparativa/tendencia (flecha + texto, p.ej. "▲ +8% vs. mes anterior") y un
+        sparkline (mini gráfico de línea). Ambas cosas son 100% opcionales y no rompen
+        el uso existente: si no se asigna Trend/SparklineValues, TrendVisibility queda
+        Collapsed y la tarjeta se ve exactamente igual que antes (misma altura, mismo
+        layout de la fila 1).
+
+        La flecha de tendencia usa "▲"/"▼" (triángulos geométricos Unicode estándar,
+        U+25B2/U+25BC, disponibles en cualquier fuente, incluida Segoe UI) en vez de
+        un glifo de icono: mismo criterio de "no adivinar codepoints de Segoe Fluent/
+        MDL2 sin poder verificarlos" que ya aplicó la Fase A al ToggleButton de tema.
+        El color (verde/rojo/gris) se resuelve con DynamicResource dentro de un Style
+        con DataTrigger (ver TrendTextStyle/TrendArrowStyle abajo): NUNCA con un
+        IValueConverter que resuelva el brush una sola vez, porque un converter no se
+        reevalúa cuando ThemeService intercambia Application.Resources en caliente (el
+        mismo problema real que la Fase A ya tuvo que evitar en otros lados).
     -->
+    <UserControl.Resources>
+        <Style x:Key="TrendArrowStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+            <Setter Property="Margin" Value="0,0,4,0"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextLightBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TrendDirection, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Up">
+                    <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding TrendDirection, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Down">
+                    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="TrendTextStyle" TargetType="TextBlock" BasedOn="{StaticResource SmallStyle}">
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="{DynamicResource TextLightBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TrendDirection, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Up">
+                    <Setter Property="Foreground" Value="{DynamicResource SuccessBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding TrendDirection, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Down">
+                    <Setter Property="Foreground" Value="{DynamicResource DangerBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+
+        <Style x:Key="SparklineStyle" TargetType="Polyline">
+            <Setter Property="StrokeThickness" Value="1.6"/>
+            <Setter Property="StrokeLineJoin" Value="Round"/>
+            <Setter Property="StrokeStartLineCap" Value="Round"/>
+            <Setter Property="StrokeEndLineCap" Value="Round"/>
+            <Setter Property="Stroke" Value="{DynamicResource SecondaryBrush}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding TrendDirection, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Up">
+                    <Setter Property="Stroke" Value="{DynamicResource SuccessBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding TrendDirection, RelativeSource={RelativeSource AncestorType=UserControl}}" Value="Down">
+                    <Setter Property="Stroke" Value="{DynamicResource DangerBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
+        </Style>
+    </UserControl.Resources>
+
     <controls:RoundedCard>
         <Grid>
-            <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="Auto"/>
-                <ColumnDefinition Width="*"/>
-            </Grid.ColumnDefinitions>
+            <Grid.RowDefinitions>
+                <RowDefinition Height="Auto"/>
+                <RowDefinition Height="Auto"/>
+            </Grid.RowDefinitions>
 
-            <Border Grid.Column="0"
-                    Width="46" Height="46"
-                    CornerRadius="23"
-                    Background="{Binding IconBrush, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                    VerticalAlignment="Center"
-                    Margin="0,0,14,0">
-                <TextBlock Text="{Binding IconGlyph, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           Foreground="White"
-                           FontSize="18"
-                           FontWeight="Bold"
-                           HorizontalAlignment="Center"
-                           VerticalAlignment="Center"/>
-            </Border>
+            <!-- ===================== Fila 1: icono + título/valor/descripción (sin cambios de Fase 5) ===================== -->
+            <Grid Grid.Row="0">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
 
-            <StackPanel Grid.Column="1" VerticalAlignment="Center">
-                <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           Style="{StaticResource SmallStyle}"
-                           FontWeight="Bold"/>
-                <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           FontFamily="{StaticResource AppFontFamily}"
-                           FontSize="22"
-                           FontWeight="Bold"
-                           Foreground="{DynamicResource TextDarkBrush}"
-                           Margin="0,2,0,0"/>
-                <TextBlock Text="{Binding Description, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                           Style="{StaticResource SmallStyle}"
-                           Margin="0,2,0,0"
-                           Visibility="{Binding DescriptionVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
-            </StackPanel>
+                <Border Grid.Column="0"
+                        Width="46" Height="46"
+                        CornerRadius="23"
+                        Background="{Binding IconBrush, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                        VerticalAlignment="Center"
+                        Margin="0,0,14,0">
+                    <TextBlock Text="{Binding IconGlyph, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Foreground="White"
+                               FontSize="18"
+                               FontWeight="Bold"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+
+                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding Title, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Style="{StaticResource SmallStyle}"
+                               FontWeight="Bold"/>
+                    <TextBlock Text="{Binding Value, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               FontFamily="{StaticResource AppFontFamily}"
+                               FontSize="22"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource TextDarkBrush}"
+                               Margin="0,2,0,0"/>
+                    <TextBlock Text="{Binding Description, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Style="{StaticResource SmallStyle}"
+                               Margin="0,2,0,0"
+                               Visibility="{Binding DescriptionVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- ===================== Fila 2 (NUEVA, opcional): comparativa/tendencia + sparkline ===================== -->
+            <Grid Grid.Row="1"
+                  Margin="0,12,0,0"
+                  Visibility="{Binding TrendVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <StackPanel Grid.Column="0" Orientation="Horizontal" VerticalAlignment="Center">
+                    <TextBlock Text="{Binding TrendArrow, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Style="{StaticResource TrendArrowStyle}"/>
+                    <TextBlock Text="{Binding TrendText, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                               Style="{StaticResource TrendTextStyle}"
+                               TextTrimming="CharacterEllipsis"/>
+                </StackPanel>
+
+                <Polyline Grid.Column="1"
+                          Points="{Binding SparklinePoints, RelativeSource={RelativeSource AncestorType=UserControl}}"
+                          Style="{StaticResource SparklineStyle}"
+                          Width="60" Height="24"
+                          Margin="10,0,0,0"
+                          HorizontalAlignment="Right"
+                          VerticalAlignment="Center"
+                          Visibility="{Binding SparklineVisibility, RelativeSource={RelativeSource AncestorType=UserControl}}"/>
+            </Grid>
         </Grid>
     </controls:RoundedCard>
 </UserControl>

@@ -10,16 +10,29 @@
              d:DataContext="{d:DesignInstance Type=prestamos:PrestamosViewModel}"
              d:DesignWidth="1050" d:DesignHeight="600">
     <UserControl.Resources>
-        <converters:FechaPrestamoToRowBrushConverter x:Key="FechaPrestamoToRowBrushConverter"/>
+        <converters:FechaPrestamoToRowCategoriaConverter x:Key="FechaPrestamoToRowCategoriaConverter"/>
 
         <!--
-            Puerto del renderer de filas de PrestamosPanel.java: blanco si <=7 días,
-            RowOverdueWarningBrush si 7-14, RowOverdueDangerBrush si >14. Se asigna a
-            InnerDataGrid.RowStyle en el code-behind (ver PrestamosView.xaml.cs) porque
-            SearchableDataGrid no expone RowStyle como propiedad de dependencia propia.
+            Puerto del renderer de filas de PrestamosPanel.java: fondo normal (heredado
+            del Style base, ya reactivo al tema) si <=7 días, RowOverdueWarningBrush si
+            7-14, RowOverdueDangerBrush si >14. Se asigna a InnerDataGrid.RowStyle en el
+            code-behind (ver PrestamosView.xaml.cs) porque SearchableDataGrid no expone
+            RowStyle como propiedad de dependencia propia.
+
+            DataTrigger + DynamicResource (NO un converter que devuelva el Brush ya
+            resuelto): ver el comentario de FechaPrestamoToRowCategoriaConverter para el
+            bug real de modo oscuro que este cambio corrigió (filas "Normal" quedaban con
+            fondo blanco fijo, ilegibles con texto claro).
         -->
         <Style x:Key="PrestamoRowStyle" TargetType="DataGridRow" BasedOn="{StaticResource AppDataGridRowStyle}">
-            <Setter Property="Background" Value="{Binding Prestamo.FechaPrestamo, Converter={StaticResource FechaPrestamoToRowBrushConverter}}"/>
+            <Style.Triggers>
+                <DataTrigger Binding="{Binding Prestamo.FechaPrestamo, Converter={StaticResource FechaPrestamoToRowCategoriaConverter}}" Value="Warning">
+                    <Setter Property="Background" Value="{DynamicResource RowOverdueWarningBrush}"/>
+                </DataTrigger>
+                <DataTrigger Binding="{Binding Prestamo.FechaPrestamo, Converter={StaticResource FechaPrestamoToRowCategoriaConverter}}" Value="Danger">
+                    <Setter Property="Background" Value="{DynamicResource RowOverdueDangerBrush}"/>
+                </DataTrigger>
+            </Style.Triggers>
         </Style>
     </UserControl.Resources>
 
@@ -40,10 +53,22 @@
                 <TextBlock Grid.Column="0" Text="Monitoreo de Préstamos Activos" Style="{StaticResource SubtitleStyle}" VerticalAlignment="Center"/>
 
                 <StackPanel Grid.Column="1" Orientation="Horizontal">
-                    <Button Content="Nuevo Préstamo" Command="{Binding NuevoPrestamoCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Command="{Binding NuevoPrestamoCommand}" Style="{StaticResource SuccessButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- "+" (Segoe MDL2 Assets, codepoint E710 "Add"), mismo criterio que el botón "Nuevo Equipo" de EquiposView. -->
+                            <TextBlock Text="&#xE710;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Nuevo Préstamo" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                     <Button Content="Ver Detalle" Command="{Binding VerDetalleCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
                     <Button Content="Registrar Devolución" Command="{Binding RegistrarDevolucionCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
-                    <Button Content="Imprimir" Command="{Binding ImprimirCommand}" Style="{StaticResource PrimaryButtonStyle}"/>
+                    <Button Command="{Binding ImprimirCommand}" Style="{StaticResource PrimaryButtonStyle}">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Impresora (Segoe MDL2 Assets, codepoint E749 "Print"). -->
+                            <TextBlock Text="&#xE749;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Imprimir" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </Grid>
         </controls:RoundedCard>

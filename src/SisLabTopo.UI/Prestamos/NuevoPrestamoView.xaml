@@ -10,7 +10,7 @@
         Width="760" Height="700"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
     <Grid Margin="20" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>

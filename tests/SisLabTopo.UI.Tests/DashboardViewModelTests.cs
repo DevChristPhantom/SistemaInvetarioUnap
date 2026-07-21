@@ -19,6 +19,25 @@ namespace SisLabTopo.UI.Tests;
 /// </summary>
 public class DashboardViewModelTests
 {
+    /// <summary>
+    /// Fake en memoria de <see cref="IDashboardHistoryStore"/>: evita que las pruebas
+    /// lean/escriban el archivo real de historial en %LOCALAPPDATA% (que además haría
+    /// que una ejecución de pruebas contaminara la "foto anterior" de la siguiente,
+    /// perdiendo el aislamiento entre pruebas).
+    /// </summary>
+    private sealed class FakeDashboardHistoryStore : IDashboardHistoryStore
+    {
+        private readonly List<DashboardSnapshot> _historial = new();
+
+        public DashboardSnapshot? AnteriorParaDevolver { get; set; }
+
+        public DashboardSnapshot? ObtenerAnterior() => AnteriorParaDevolver;
+
+        public IReadOnlyList<DashboardSnapshot> ObtenerSerie(int maxPuntos) => _historial.TakeLast(maxPuntos).ToList();
+
+        public void Guardar(DashboardSnapshot snapshot) => _historial.Add(snapshot);
+    }
+
     private static Equipo CrearEquipo(string codigo, EstadoEquipo estado = EstadoEquipo.Bueno, bool disponible = true) => new()
     {
         Codigo = codigo,
@@ -63,10 +82,18 @@ public class DashboardViewModelTests
         prestamoService.Setup(s => s.PrestamosPorMesAsync(6, It.IsAny<CancellationToken>())).ReturnsAsync(new List<PrestamosPorMesItem>());
         prestamoService.Setup(s => s.ObtenerActivosAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Prestamo>());
         prestamoService.Setup(s => s.EquiposMasPrestadosAsync(5, It.IsAny<CancellationToken>())).ReturnsAsync(new List<EquipoConteo>());
+        // ConstruirTimelineItemAsync (fila 3 del Dashboard, Fase B) llama a
+        // ObtenerDetalleAsync por cada préstamo activo reciente -- sin este default, Moq
+        // (loose mock) devuelve una Task<List<DetallePrestamo>> con resultado null para
+        // cualquier invocación no configurada explícitamente, y el ViewModel revienta con
+        // NullReferenceException al hacer detalles.Count.
+        prestamoService.Setup(s => s.ObtenerDetalleAsync(It.IsAny<string>(), It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<DetallePrestamo>());
 
         return new DashboardViewModel(
             equipoService.Object, prestamoService.Object, reporteService.Object, comprobanteGenerator.Object,
-            dialogService.Object, NullLogger<DashboardViewModel>.Instance);
+            dialogService.Object, NullLogger<DashboardViewModel>.Instance,
+            new FakeDashboardHistoryStore());
     }
 
     [Fact]
@@ -155,6 +182,139 @@ public class DashboardViewModelTests
         Assert.Equal("EQ-001", fila.Codigo);
         Assert.Equal("Estación Total", fila.Denominacion);
         Assert.Equal(3, fila.Cantidad);
+    }
+
+    [Fact]
+    public async Task Cargar_ConPrestamosActivos_ConstruyeElTimelineConResumenDeEquipos()
+    {
+        var vm = CrearViewModel(out var equipoService, out var prestamoService, out _, out _);
+        var conVarios = CrearPrestamo("11111111-aaaa-bbbb-cccc-000000000001", DateTime.Now.AddMinutes(-5));
+        var conUno = CrearPrestamo("22222222-aaaa-bbbb-cccc-000000000002", DateTime.Now);
+        prestamoService.Setup(s => s.ObtenerActivosAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Prestamo> { conVarios, conUno });
+
+        prestamoService.Setup(s => s.ObtenerDetalleAsync(conVarios.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<DetallePrestamo>
+            {
+                new() { EquipoCodigo = "EQ-001" },
+                new() { EquipoCodigo = "EQ-002" },
+            });
+        prestamoService.Setup(s => s.ObtenerDetalleAsync(conUno.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<DetallePrestamo> { new() { EquipoCodigo = "EQ-003" } });
+
+        var equipo1 = CrearEquipo("EQ-001");
+        equipo1.Denominacion = "Estación Total Leica";
+        var equipo3 = CrearEquipo("EQ-003");
+        equipo3.Denominacion = "Nivel Láser";
+        equipoService.Setup(s => s.BuscarPorCodigoAsync("EQ-001", It.IsAny<CancellationToken>())).ReturnsAsync(equipo1);
+        equipoService.Setup(s => s.BuscarPorCodigoAsync("EQ-003", It.IsAny<CancellationToken>())).ReturnsAsync(equipo3);
+
+        await vm.CargarCommand.ExecuteAsync(null);
+
+        Assert.Equal(2, vm.TimelinePrestamosActivos.Count);
+        // El más reciente (conUno) primero, igual que UltimosPrestamosActivos.
+        var itemMasReciente = vm.TimelinePrestamosActivos[0];
+        Assert.Equal(conUno.Id, itemMasReciente.Prestamo.Id);
+        Assert.Equal("Nivel Láser", itemMasReciente.EquipoResumen);
+
+        var itemConVarios = vm.TimelinePrestamosActivos[1];
+        Assert.Equal(conVarios.Id, itemConVarios.Prestamo.Id);
+        Assert.Equal("Estación Total Leica (+1 más)", itemConVarios.EquipoResumen);
+    }
+
+    [Fact]
+    public async Task Cargar_ConPrestamoSinDetalles_MuestraResumenDeTimelineExplicito()
+    {
+        var vm = CrearViewModel(out _, out var prestamoService, out _, out _);
+        var prestamo = CrearPrestamo("11111111-aaaa-bbbb-cccc-000000000001", DateTime.Now);
+        prestamoService.Setup(s => s.ObtenerActivosAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Prestamo> { prestamo });
+        prestamoService.Setup(s => s.ObtenerDetalleAsync(prestamo.Id, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<DetallePrestamo>());
+
+        await vm.CargarCommand.ExecuteAsync(null);
+
+        var item = Assert.Single(vm.TimelinePrestamosActivos);
+        Assert.Equal("Sin equipos registrados", item.EquipoResumen);
+    }
+
+    [Fact]
+    public async Task Cargar_ConFotoAnteriorEnHistorial_CalculaTendenciaYSparklineDeLasTarjetas()
+    {
+        var equipoService = new Mock<IEquipoService>();
+        var prestamoService = new Mock<IPrestamoService>();
+        var reporteService = new Mock<IReporteService>();
+        var dialogService = new Mock<IDialogService>();
+        var comprobanteGenerator = new Mock<IComprobantePrestamoGenerator>();
+
+        equipoService.Setup(s => s.ObtenerTodosAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Equipo> { CrearEquipo("EQ-001"), CrearEquipo("EQ-002"), CrearEquipo("EQ-003") });
+        equipoService.Setup(s => s.ObtenerDisponiblesAsync(It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<Equipo> { CrearEquipo("EQ-001") });
+        equipoService.Setup(s => s.ContarPorEstadoAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new Dictionary<EstadoEquipo, int>());
+        prestamoService.Setup(s => s.ContarActivosAsync(It.IsAny<CancellationToken>())).ReturnsAsync(5);
+        prestamoService.Setup(s => s.ContarDevueltosHoyAsync(It.IsAny<CancellationToken>())).ReturnsAsync(1);
+        prestamoService.Setup(s => s.PrestamosPorMesAsync(6, It.IsAny<CancellationToken>()))
+            .ReturnsAsync(new List<PrestamosPorMesItem>
+            {
+                new(2026, 6, 4),
+                new(2026, 7, 6),
+            });
+        prestamoService.Setup(s => s.ObtenerActivosAsync(It.IsAny<CancellationToken>())).ReturnsAsync(new List<Prestamo>());
+        prestamoService.Setup(s => s.EquiposMasPrestadosAsync(5, It.IsAny<CancellationToken>())).ReturnsAsync(new List<EquipoConteo>());
+
+        var historyStore = new FakeDashboardHistoryStore
+        {
+            AnteriorParaDevolver = new DashboardSnapshot(DateTime.Now.AddDays(-1), TotalEquipos: 2, EquiposDisponibles: 2, PrestamosActivos: 3, DevolucionesHoy: 0),
+        };
+
+        var vm = new DashboardViewModel(
+            equipoService.Object, prestamoService.Object, reporteService.Object, comprobanteGenerator.Object,
+            dialogService.Object, NullLogger<DashboardViewModel>.Instance, historyStore);
+
+        await vm.CargarCommand.ExecuteAsync(null);
+
+        // Total Equipos: 3 ahora vs. 2 antes -> +1.
+        Assert.Equal("+1 vs. última carga", vm.TotalEquiposTrendTexto);
+        Assert.Equal("Up", vm.TotalEquiposTrendDireccion);
+
+        // Equipos Disponibles: 1 ahora vs. 2 antes -> -1.
+        Assert.Equal("-1 vs. última carga", vm.EquiposDisponiblesTrendTexto);
+        Assert.Equal("Down", vm.EquiposDisponiblesTrendDireccion);
+
+        // Devoluciones Hoy: 1 ahora vs. 0 antes -> +1.
+        Assert.Equal("+1 vs. última carga", vm.DevolucionesHoyTrendTexto);
+        Assert.Equal("Up", vm.DevolucionesHoyTrendDireccion);
+
+        // Préstamos Activos: comparación mensual real (6 -> 4 = +50%), no contra el historial.
+        Assert.Equal("+50% vs. mes anterior", vm.PrestamosActivosTrendTexto);
+        Assert.Equal("Up", vm.PrestamosActivosTrendDireccion);
+        Assert.Equal(new[] { 4d, 6d }, vm.PrestamosActivosSparkline);
+
+        // El sparkline de las 3 tarjetas restantes viene de ObtenerSerie(8) sobre el
+        // FakeDashboardHistoryStore: tras el Guardar() de esta misma carga, contiene
+        // exactamente 1 punto (la foto recién guardada), porque el fake arranca vacío.
+        Assert.Equal(new[] { 3d }, vm.TotalEquiposSparkline);
+        Assert.Equal(new[] { 1d }, vm.EquiposDisponiblesSparkline);
+        Assert.Equal(new[] { 1d }, vm.DevolucionesHoySparkline);
+    }
+
+    [Fact]
+    public async Task Cargar_SinFotoAnteriorEnHistorial_NoMuestraTendencia()
+    {
+        var vm = CrearViewModel(out _, out _, out _, out _);
+
+        await vm.CargarCommand.ExecuteAsync(null);
+
+        Assert.Equal(string.Empty, vm.TotalEquiposTrendTexto);
+        Assert.Equal("Flat", vm.TotalEquiposTrendDireccion);
+        Assert.Equal(string.Empty, vm.EquiposDisponiblesTrendTexto);
+        Assert.Equal("Flat", vm.EquiposDisponiblesTrendDireccion);
+        Assert.Equal(string.Empty, vm.DevolucionesHoyTrendTexto);
+        Assert.Equal("Flat", vm.DevolucionesHoyTrendDireccion);
+        // Sin datos mensuales (< 2 meses), tampoco hay tendencia de Préstamos Activos.
+        Assert.Equal(string.Empty, vm.PrestamosActivosTrendTexto);
+        Assert.Equal("Flat", vm.PrestamosActivosTrendDireccion);
     }
 
     [Fact]

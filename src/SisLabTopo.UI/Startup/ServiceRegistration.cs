@@ -48,6 +48,13 @@ public static class ServiceRegistration
         // IDialogService más abajo.
         services.AddSingleton<IThemeService, ThemeService>();
 
+        // Fase B (rediseño de tablas/tarjetas): historial local (solo UI, ver comentario
+        // XML de IDashboardHistoryStore) usado por DashboardViewModel para calcular la
+        // comparativa/tendencia + sparkline de la fila 1 del Dashboard. Singleton por la
+        // misma razón que IThemeService/IDialogService: un único recurso compartido para
+        // toda la sesión.
+        services.AddSingleton<Dashboard.IDashboardHistoryStore, Dashboard.DashboardHistoryStore>();
+
         // Ventanas raíz (Login/Shell): registradas Transient -- NO Scoped -- a propósito.
         //
         // Fix de la Fase 8 (QA final): originalmente estaban como Scoped, "para compartir

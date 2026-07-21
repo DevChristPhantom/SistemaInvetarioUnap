@@ -10,7 +10,7 @@
         Width="440" SizeToContent="Height"
         WindowStartupLocation="CenterOwner"
         ResizeMode="NoResize"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
     <StackPanel Margin="20">
         <TextBlock Text="Seleccione el préstamo a devolver:"
                    Style="{StaticResource BodyStyle}"

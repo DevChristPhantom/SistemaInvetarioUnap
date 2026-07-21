@@ -45,7 +45,10 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
     private readonly IReporteService _reporteService;
     private readonly IComprobantePrestamoGenerator _comprobanteGenerator;
     private readonly IDialogService _dialogService;
+    private readonly IDashboardHistoryStore _historyStore;
     private readonly ILogger<DashboardViewModel> _logger;
+
+    private const string EtiquetaComparativa = "vs. última carga";
 
     [ObservableProperty]
     private string _totalEquiposTexto = "0";
@@ -58,6 +61,48 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
 
     [ObservableProperty]
     private string _devolucionesHoyTexto = "0";
+
+    // ===================== Comparativa/tendencia + sparkline (Fase B) =====================
+    // Las 3 primeras (Total Equipos/Disponibles/Devoluciones Hoy) se comparan contra la
+    // última "foto" guardada en IDashboardHistoryStore -- ver el comentario XML de esa
+    // interfaz para la justificación de por qué es "vs. última carga" y no "vs. ayer".
+    // Préstamos Activos, en cambio, usa el desglose mensual real que ya trae
+    // PrestamosPorMesAsync (más significativo: mes actual vs. mes anterior).
+    [ObservableProperty]
+    private string _totalEquiposTrendTexto = string.Empty;
+
+    [ObservableProperty]
+    private string _totalEquiposTrendDireccion = "Flat";
+
+    [ObservableProperty]
+    private double[] _totalEquiposSparkline = Array.Empty<double>();
+
+    [ObservableProperty]
+    private string _equiposDisponiblesTrendTexto = string.Empty;
+
+    [ObservableProperty]
+    private string _equiposDisponiblesTrendDireccion = "Flat";
+
+    [ObservableProperty]
+    private double[] _equiposDisponiblesSparkline = Array.Empty<double>();
+
+    [ObservableProperty]
+    private string _prestamosActivosTrendTexto = string.Empty;
+
+    [ObservableProperty]
+    private string _prestamosActivosTrendDireccion = "Flat";
+
+    [ObservableProperty]
+    private double[] _prestamosActivosSparkline = Array.Empty<double>();
+
+    [ObservableProperty]
+    private string _devolucionesHoyTrendTexto = string.Empty;
+
+    [ObservableProperty]
+    private string _devolucionesHoyTrendDireccion = "Flat";
+
+    [ObservableProperty]
+    private double[] _devolucionesHoySparkline = Array.Empty<double>();
 
     /// <summary>Falso cuando no hay ningún equipo registrado -- la vista muestra el placeholder "Sin datos disponibles" en vez del donut.</summary>
     [ObservableProperty]
@@ -96,6 +141,16 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
     [ObservableProperty]
     private ObservableCollection<Prestamo> _ultimosPrestamosActivos = new();
 
+    /// <summary>
+    /// Igual conjunto que <see cref="UltimosPrestamosActivos"/> (los mismos 5 préstamos
+    /// activos más recientes), envuelto con el resumen del equipo prestado para el
+    /// timeline visual de la fila 3 del Dashboard (Fase B). Se mantiene
+    /// <see cref="UltimosPrestamosActivos"/> intacto (mismo tipo/mismo contenido) para no
+    /// romper ningún binding/prueba existente de la Fase 5.
+    /// </summary>
+    [ObservableProperty]
+    private ObservableCollection<PrestamoTimelineItem> _timelinePrestamosActivos = new();
+
     [ObservableProperty]
     [NotifyPropertyChangedFor(nameof(SinEquiposMasPrestados))]
     private bool _hayEquiposMasPrestados;
@@ -123,7 +178,8 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
         IReporteService reporteService,
         IComprobantePrestamoGenerator comprobanteGenerator,
         IDialogService dialogService,
-        ILogger<DashboardViewModel> logger)
+        ILogger<DashboardViewModel> logger,
+        IDashboardHistoryStore? historyStore = null)
     {
         _equipoService = equipoService;
         _prestamoService = prestamoService;
@@ -131,6 +187,7 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
         _comprobanteGenerator = comprobanteGenerator;
         _dialogService = dialogService;
         _logger = logger;
+        _historyStore = historyStore ?? new DashboardHistoryStore();
     }
 
     private bool PuedeCargar() => !IsBusy;
@@ -152,8 +209,9 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
             DevolucionesHoyTexto = devueltosHoy.ToString(CultureInfo.InvariantCulture);
 
             await CargarGraficoEstadoAsync(todos.Count);
-            await CargarGraficoMensualAsync();
+            var porMes = await CargarGraficoMensualAsync();
             await CargarTablasAsync();
+            AplicarTendenciasYSparklines(todos.Count, disponibles.Count, (int)activos, (int)devueltosHoy, porMes);
 
             EquiposDisponiblesRapida = new ObservableCollection<Equipo>(disponibles);
         }
@@ -190,7 +248,7 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
             .ToArray();
     }
 
-    private async Task CargarGraficoMensualAsync()
+    private async Task<List<PrestamosPorMesItem>> CargarGraficoMensualAsync()
     {
         // Ya viene con relleno de ceros para los últimos 6 meses, ordenado antiguo->reciente: no recalcular.
         var porMes = await _prestamoService.PrestamosPorMesAsync(6);
@@ -210,10 +268,15 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
             {
                 Values = porMes.Select(p => p.Cantidad).ToArray(),
                 Name = "Préstamos",
-                Fill = new SolidColorPaint(SKColor.Parse("#2e6da4")),
+                // Azul secundario de la paleta institucional (SecondaryBrush/#2563EB) en
+                // vez del azul "Java" (#2e6da4) que traía la Fase 5 -- ajuste de color a
+                // la paleta nueva pedido explícitamente para la fila 2 del Dashboard.
+                Fill = new SolidColorPaint(SKColor.Parse("#2563EB")),
                 MaxBarWidth = 40,
             }
         };
+
+        return porMes;
     }
 
     /// <summary>"MMM yy" en español sin el punto de abreviación de .NET (p.ej. "jul 26" en vez de "jul. 26"), equivalente a <c>DateTimeFormatter.ofPattern("MMM yy")</c> en Java.</summary>
@@ -232,8 +295,10 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
         // ObtenerActivosAsync sin criterio explícito): se ordena por fecha de préstamo
         // descendente para que "Últimos Préstamos Activos" muestre, de forma literal,
         // los más recientes primero.
-        UltimosPrestamosActivos = new ObservableCollection<Prestamo>(
-            activos.OrderByDescending(p => p.FechaPrestamo).Take(5));
+        var ultimos = activos.OrderByDescending(p => p.FechaPrestamo).Take(5).ToList();
+        UltimosPrestamosActivos = new ObservableCollection<Prestamo>(ultimos);
+        TimelinePrestamosActivos = new ObservableCollection<PrestamoTimelineItem>(
+            await Task.WhenAll(ultimos.Select(ConstruirTimelineItemAsync)));
 
         var masPrestados = await _prestamoService.EquiposMasPrestadosAsync(5);
         HayEquiposMasPrestados = masPrestados.Count > 0;
@@ -246,6 +311,103 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
         }
 
         EquiposMasPrestados = new ObservableCollection<EquipoMasPrestadoRow>(filas);
+    }
+
+    /// <summary>
+    /// Arma el resumen legible del/los equipo(s) prestados de un préstamo, para el
+    /// timeline visual (fila 3 del Dashboard). Acotado a los 5 préstamos más recientes
+    /// (mismo límite que <see cref="UltimosPrestamosActivos"/>), así que el costo extra
+    /// de <see cref="IPrestamoService.ObtenerDetalleAsync"/> +
+    /// <see cref="IEquipoService.BuscarPorCodigoAsync"/> por ítem es el mismo patrón
+    /// acotado (bucle sobre un top-N pequeño, nunca sobre listas grandes) que ya usa
+    /// este mismo ViewModel para <c>EquiposMasPrestados</c> arriba.
+    /// </summary>
+    private async Task<PrestamoTimelineItem> ConstruirTimelineItemAsync(Prestamo prestamo)
+    {
+        var detalles = await _prestamoService.ObtenerDetalleAsync(prestamo.Id);
+        if (detalles.Count == 0)
+        {
+            return new PrestamoTimelineItem(prestamo, "Sin equipos registrados");
+        }
+
+        var primerEquipo = await _equipoService.BuscarPorCodigoAsync(detalles[0].EquipoCodigo);
+        var nombrePrimero = primerEquipo?.Denominacion ?? detalles[0].EquipoCodigo;
+        var resumen = detalles.Count > 1 ? $"{nombrePrimero} (+{detalles.Count - 1} más)" : nombrePrimero;
+
+        return new PrestamoTimelineItem(prestamo, resumen);
+    }
+
+    /// <summary>
+    /// Calcula comparativa/tendencia + sparkline de las 4 tarjetas de la fila 1 (Fase
+    /// B). Se llama al final de <see cref="CargarAsync"/> (después de tener ya todos
+    /// los conteos frescos), y es la única responsable de leer/escribir
+    /// <see cref="_historyStore"/> -- así una sola carga del Dashboard produce como
+    /// mucho una lectura y una escritura del archivo de historial, nunca más.
+    /// </summary>
+    private void AplicarTendenciasYSparklines(
+        int totalEquipos, int equiposDisponibles, int prestamosActivos, int devolucionesHoy,
+        List<PrestamosPorMesItem> porMes)
+    {
+        var anterior = _historyStore.ObtenerAnterior();
+        _historyStore.Guardar(new DashboardSnapshot(DateTime.Now, totalEquipos, equiposDisponibles, prestamosActivos, devolucionesHoy));
+        var serie = _historyStore.ObtenerSerie(8);
+
+        (TotalEquiposTrendTexto, TotalEquiposTrendDireccion) = CalcularTendenciaConteo(totalEquipos, anterior?.TotalEquipos);
+        TotalEquiposSparkline = serie.Select(s => (double)s.TotalEquipos).ToArray();
+
+        (EquiposDisponiblesTrendTexto, EquiposDisponiblesTrendDireccion) = CalcularTendenciaConteo(equiposDisponibles, anterior?.EquiposDisponibles);
+        EquiposDisponiblesSparkline = serie.Select(s => (double)s.EquiposDisponibles).ToArray();
+
+        (DevolucionesHoyTrendTexto, DevolucionesHoyTrendDireccion) = CalcularTendenciaConteo(devolucionesHoy, anterior?.DevolucionesHoy);
+        DevolucionesHoySparkline = serie.Select(s => (double)s.DevolucionesHoy).ToArray();
+
+        // Préstamos Activos: se compara el mes actual contra el mes anterior usando el
+        // desglose mensual REAL que ya trae PrestamosPorMesAsync (más significativo
+        // que "vs. última carga"), y el sparkline usa esos mismos 6 meses.
+        (PrestamosActivosTrendTexto, PrestamosActivosTrendDireccion) = CalcularTendenciaMensual(porMes);
+        PrestamosActivosSparkline = porMes.Select(p => (double)p.Cantidad).ToArray();
+    }
+
+    private static (string Texto, string Direccion) CalcularTendenciaConteo(int actual, int? anterior)
+    {
+        if (anterior is null)
+        {
+            return (string.Empty, "Flat");
+        }
+
+        var delta = actual - anterior.Value;
+        if (delta == 0)
+        {
+            return ($"Sin cambios {EtiquetaComparativa}", "Flat");
+        }
+
+        var signo = delta > 0 ? "+" : string.Empty;
+        var direccion = delta > 0 ? "Up" : "Down";
+        return ($"{signo}{delta} {EtiquetaComparativa}", direccion);
+    }
+
+    private static (string Texto, string Direccion) CalcularTendenciaMensual(List<PrestamosPorMesItem> porMes)
+    {
+        if (porMes.Count < 2)
+        {
+            return (string.Empty, "Flat");
+        }
+
+        var actual = porMes[^1].Cantidad;
+        var anterior = porMes[^2].Cantidad;
+        var delta = actual - anterior;
+
+        if (anterior == 0)
+        {
+            return delta == 0
+                ? (string.Empty, "Flat")
+                : ($"+{delta} vs. mes anterior", "Up");
+        }
+
+        var porcentaje = (int)Math.Round(delta / (double)anterior * 100);
+        var signo = porcentaje > 0 ? "+" : string.Empty;
+        var direccion = porcentaje > 0 ? "Up" : porcentaje < 0 ? "Down" : "Flat";
+        return ($"{signo}{porcentaje}% vs. mes anterior", direccion);
     }
 
     [RelayCommand(CanExecute = nameof(PuedeCargar))]
