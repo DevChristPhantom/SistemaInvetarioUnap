@@ -42,7 +42,7 @@
             </ItemsControl.ItemsPanel>
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <Border BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,0,0,1" Padding="0,6">
+                    <Border BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="0,0,0,1" Padding="0,6">
                         <TextBlock Style="{StaticResource BodyStyle}">
                             <Run Text="{Binding Numero, Mode=OneWay}"/>
                             <Run Text=". ["/>

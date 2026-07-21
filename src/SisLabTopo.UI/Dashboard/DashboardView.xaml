@@ -15,7 +15,7 @@
         Disponibilidad Rápida). Todo deshabilitado (IsEnabled) mientras IsBusy, igual que
         el resto de pantallas de la Fase 5.
     -->
-    <Grid Background="{StaticResource BackgroundBrush}">
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
@@ -32,13 +32,13 @@
 
             <controls:StatCard Grid.Column="0" Margin="0,0,8,0"
                                 Title="Total Equipos" Value="{Binding TotalEquiposTexto}" Description="Registrados"
-                                IconGlyph="EQ" IconBrush="{StaticResource PrimaryBrush}"/>
+                                IconGlyph="EQ" IconBrush="{DynamicResource PrimaryBrush}"/>
             <controls:StatCard Grid.Column="1" Margin="8,0,8,0"
                                 Title="Equipos Disponibles" Value="{Binding EquiposDisponiblesTexto}" Description="Listos para préstamo"
-                                IconGlyph="OK" IconBrush="{StaticResource SuccessBrush}"/>
+                                IconGlyph="OK" IconBrush="{DynamicResource SuccessBrush}"/>
             <controls:StatCard Grid.Column="2" Margin="8,0,8,0"
                                 Title="Préstamos Activos" Value="{Binding PrestamosActivosTexto}" Description="Equipos en préstamo"
-                                IconGlyph="PR" IconBrush="{StaticResource AccentBrush}"/>
+                                IconGlyph="PR" IconBrush="{DynamicResource AccentBrush}"/>
             <controls:StatCard Grid.Column="3" Margin="8,0,0,0"
                                 Title="Devoluciones Hoy" Value="{Binding DevolucionesHoyTexto}" Description="Esperando devolución"
                                 IconGlyph="DV">

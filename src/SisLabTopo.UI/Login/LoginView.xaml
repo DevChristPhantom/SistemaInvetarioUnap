@@ -8,7 +8,7 @@
         Width="1000" Height="620"
         MinWidth="760" MinHeight="520"
         WindowStartupLocation="CenterScreen"
-        Background="White">
+        Background="{DynamicResource BackgroundBrush}">
 
     <Grid>
         <Grid.ColumnDefinitions>
@@ -29,16 +29,16 @@
                 <TextBlock Text="ACCESO ADMINISTRATIVO"
                            Style="{StaticResource SmallStyle}"
                            FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryBrush}"
+                           Foreground="{DynamicResource PrimaryBrush}"
                            HorizontalAlignment="Left"
                            Margin="0,0,0,20"/>
 
-                <Ellipse Width="90" Height="90" Fill="{StaticResource PrimaryBrush}" HorizontalAlignment="Center"/>
+                <Ellipse Width="90" Height="90" Fill="{DynamicResource PrimaryBrush}" HorizontalAlignment="Center"/>
 
                 <TextBlock Text="Bienvenido"
                            FontFamily="{StaticResource AppFontFamily}"
                            FontSize="28" FontWeight="Bold"
-                           Foreground="{StaticResource PrimaryBrush}"
+                           Foreground="{DynamicResource PrimaryBrush}"
                            HorizontalAlignment="Center"
                            Margin="0,20,0,4"/>
 
@@ -57,7 +57,7 @@
                 <TextBlock Text="{Binding ErrorMessage}"
                            Style="{StaticResource SmallStyle}"
                            FontWeight="Bold"
-                           Foreground="{StaticResource DangerBrush}"
+                           Foreground="{DynamicResource DangerBrush}"
                            TextAlignment="Center"
                            TextWrapping="Wrap"
                            HorizontalAlignment="Center"
@@ -91,8 +91,8 @@
         <Border Grid.Column="1">
             <Border.Background>
                 <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
-                    <GradientStop Color="#0A1D37" Offset="0"/>
-                    <GradientStop Color="#0E4C92" Offset="1"/>
+                    <GradientStop Color="#0F2B5B" Offset="0"/>
+                    <GradientStop Color="#2563EB" Offset="1"/>
                 </LinearGradientBrush>
             </Border.Background>
             <Grid Margin="40">
@@ -104,7 +104,7 @@
 
                 <StackPanel Grid.Row="1" Orientation="Horizontal" HorizontalAlignment="Center">
                     <StackPanel Margin="0,0,40,0" Width="150">
-                        <Image Source="/Assets/Logo_UNAP.png" Width="110" Height="110"/>
+                        <Image Source="pack://application:,,,/SisLabTopo.UI;component/Assets/Logo_UNAP.png" Width="110" Height="110"/>
                         <TextBlock Text="UNIVERSIDAD NACIONAL DEL ALTIPLANO"
                                    FontFamily="{StaticResource AppFontFamily}"
                                    FontWeight="Bold"
@@ -116,7 +116,7 @@
                                    TextAlignment="Center"/>
                     </StackPanel>
                     <StackPanel Width="150">
-                        <Image Source="/Assets/Logo_Minas.png" Width="110" Height="110"/>
+                        <Image Source="pack://application:,,,/SisLabTopo.UI;component/Assets/Logo_Minas.png" Width="110" Height="110"/>
                         <TextBlock Text="ESCUELA PROFESIONAL DE INGENIERÍA DE MINAS"
                                    FontFamily="{StaticResource AppFontFamily}"
                                    FontWeight="Bold"

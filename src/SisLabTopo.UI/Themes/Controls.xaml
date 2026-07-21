@@ -8,15 +8,54 @@
         <ResourceDictionary Source="Spacing.xaml"/>
     </ResourceDictionary.MergedDictionaries>
 
+    <!--
+        Rediseño visual profesional (Fluent/macOS/Azure Portal/VS2022): todos los
+        estilos de esta hoja mantienen los mismos x:Key que ya consumían las 5
+        pantallas + diálogos (para no romper ningún binding existente), pero con
+        plantillas nuevas: transiciones de color animadas (150-200ms) en vez de saltos
+        instantáneos de Opacity, foco visible explícito, y una superficie de tabla
+        "header gris claro / filas blancas / hover" en vez del header azul sólido
+        anterior.
+    -->
+
+    <!-- ===================== Foco visible (accesibilidad) ===================== -->
+    <!--
+        Estilo de foco compartido: rectángulo redondeado con el borde de acento
+        (FocusBorderBrush), ligeramente más grande que el control, sin relleno —
+        reemplaza el rectángulo punteado por defecto de WPF por uno más "Fluent",
+        visible en ambos modos claro/oscuro porque FocusBorderBrush cambia con el tema.
+    -->
+    <Style x:Key="FluentFocusVisualStyle">
+        <Setter Property="Control.Template">
+            <Setter.Value>
+                <ControlTemplate>
+                    <Rectangle Margin="-2"
+                               RadiusX="8"
+                               RadiusY="8"
+                               Stroke="{DynamicResource FocusBorderBrush}"
+                               StrokeThickness="2"
+                               SnapsToDevicePixels="True"/>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+    </Style>
+
     <!-- ===================== Button ===================== -->
-    <!-- Botón primario redondeado (~8px), puerto del estilo "roundRect" de FlatLaf. -->
+    <!--
+        Botón primario: icono+texto (el ContentPresenter admite cualquier contenido, p.ej.
+        un StackPanel con un glifo Segoe Fluent/MDL2 + TextBlock), esquinas redondeadas
+        (ButtonCornerRadius, 10px), y transición de color animada de fondo en
+        hover/pressed/disabled (~160ms) en vez del salto de Opacity anterior — el color
+        real de fondo cambia (más claro en hover, más oscuro en pressed) como en
+        Windows 11, no solo su opacidad.
+    -->
     <Style x:Key="PrimaryButtonStyle" TargetType="Button">
-        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource PrimaryBrush}"/>
         <Setter Property="Foreground" Value="White"/>
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
         <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Padding" Value="16,8"/>
+        <Setter Property="Padding" Value="16,9"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
@@ -28,16 +67,55 @@
                             CornerRadius="{StaticResource ButtonCornerRadius}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             BorderBrush="{TemplateBinding BorderBrush}">
+                        <Border.RenderTransform>
+                            <ScaleTransform x:Name="PressScale" ScaleX="1" ScaleY="1"/>
+                        </Border.RenderTransform>
+                        <Border.RenderTransformOrigin>0.5,0.5</Border.RenderTransformOrigin>
                         <ContentPresenter HorizontalAlignment="Center"
                                            VerticalAlignment="Center"
-                                           Margin="{TemplateBinding Padding}"/>
+                                           Margin="{TemplateBinding Padding}"
+                                           RecognizesAccessKey="True"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Opacity" Value="0.90"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Opacity" To="0.90" Duration="0:0:0.16"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Opacity" To="1.0" Duration="0:0:0.16"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsPressed" Value="True">
-                            <Setter TargetName="Bg" Property="Opacity" Value="0.75"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Opacity" To="0.78" Duration="0:0:0.08"/>
+                                        <DoubleAnimation Storyboard.TargetName="PressScale" Storyboard.TargetProperty="ScaleX" To="0.97" Duration="0:0:0.08"/>
+                                        <DoubleAnimation Storyboard.TargetName="PressScale" Storyboard.TargetProperty="ScaleY" To="0.97" Duration="0:0:0.08"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <!-- Vuelve al nivel de opacidad de "hover" (0.90): al soltar el botón el
+                                             puntero sigue encima en la interacción normal de mouse, así que este es
+                                             el estado correcto de destino; si el puntero también salió, el propio
+                                             Trigger de IsMouseOver aplicará su ExitActions y llevará la opacidad a 1.0. -->
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Opacity" To="0.90" Duration="0:0:0.10"/>
+                                        <DoubleAnimation Storyboard.TargetName="PressScale" Storyboard.TargetProperty="ScaleX" To="1" Duration="0:0:0.10"/>
+                                        <DoubleAnimation Storyboard.TargetName="PressScale" Storyboard.TargetProperty="ScaleY" To="1" Duration="0:0:0.10"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
                             <Setter TargetName="Bg" Property="Opacity" Value="0.5"/>
@@ -46,81 +124,241 @@
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FluentFocusVisualStyle}"/>
     </Style>
 
     <Style x:Key="SecondaryButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
-        <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource SecondaryBrush}"/>
     </Style>
 
     <Style x:Key="SuccessButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
-        <Setter Property="Background" Value="{StaticResource SuccessBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource SuccessBrush}"/>
     </Style>
 
     <Style x:Key="DangerButtonStyle" TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}">
-        <Setter Property="Background" Value="{StaticResource DangerBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource DangerBrush}"/>
     </Style>
 
     <!-- Botón "fantasma" (sin relleno) usado en enlaces / iconos, p.ej. "Olvidó su contraseña" -->
     <Style x:Key="LinkButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource TextLightBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextLightBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="11"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="12"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border Background="Transparent">
+                    <Border Background="Transparent" Padding="4,2">
                         <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter Property="Foreground" Value="{StaticResource PrimaryBrush}"/>
+                            <Setter Property="Foreground" Value="{DynamicResource SecondaryBrush}"/>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FluentFocusVisualStyle}"/>
     </Style>
 
     <!-- Estilo por defecto: todo <Button/> sin Style explícito usa el primario -->
     <Style TargetType="Button" BasedOn="{StaticResource PrimaryButtonStyle}"/>
 
     <!--
+        Icono + texto en el sidebar, teñido según estado (ver comentario de
+        SidebarNavButtonStyle más abajo).
+    -->
+    <Style x:Key="SidebarIconStyle" TargetType="Rectangle">
+        <Setter Property="Width" Value="20"/>
+        <Setter Property="Height" Value="20"/>
+        <Setter Property="Margin" Value="4,0,14,0"/>
+        <Setter Property="Fill" Value="{DynamicResource SidebarIconInactiveBrush}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                <Setter Property="Fill" Value="{DynamicResource SidebarIconActiveBrush}"/>
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Fill" Value="{DynamicResource SidebarIconActiveBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <Style x:Key="SidebarLabelStyle" TargetType="TextBlock">
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
+        <Setter Property="Foreground" Value="{DynamicResource SidebarTextInactiveBrush}"/>
+        <Style.Triggers>
+            <DataTrigger Binding="{Binding Tag, RelativeSource={RelativeSource AncestorType=Button}}" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SidebarTextActiveBrush}"/>
+            </DataTrigger>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Foreground" Value="{DynamicResource SidebarTextActiveBrush}"/>
+            </Trigger>
+        </Style.Triggers>
+    </Style>
+
+    <!--
         Botón de navegación del sidebar del Shell. El estado "activo" se comunica vía la
         propiedad Tag (bindeada por la vista a un bool calculado con
-        ViewModelIsTypeConverter), puerto directo del truco de pintura condicional que
-        usaba MainFrame.crearSidebar() (fondo SidebarActiveBrush si
-        cardName.equals(currentCard)).
+        ViewModelIsTypeConverter). Rediseño estilo macOS/Fluent NavigationView:
+          - Un "pill" de fondo translúcido azul (SidebarActivePillBrush) + una barra
+            vertical de 3px en SecondaryBrush a la izquierda cuando el módulo está
+            activo (doble señal visual: la "Ley de Hick" se beneficia de que el ítem
+            activo sea inconfundible de un vistazo).
+          - Hover con un overlay blanco translúcido muy sutil (SidebarHoverBrush) que se
+            desvanece con una animación de Color de ~160ms (antes era un salto
+            instantáneo de Background).
+          - El icono/texto (ver SidebarIconStyle/SidebarLabelStyle arriba) se atenúan
+            cuando el ítem está inactivo y se iluminan a blanco en hover/activo.
     -->
     <Style x:Key="SidebarNavButtonStyle" TargetType="Button">
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="White"/>
-        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Height" Value="42"/>
-        <Setter Property="Margin" Value="0,0,0,8"/>
+        <Setter Property="Height" Value="44"/>
+        <Setter Property="Margin" Value="0,0,0,4"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="Padding" Value="15,0"/>
+        <Setter Property="Padding" Value="14,0"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Cursor" Value="Hand"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="Button">
-                    <Border x:Name="Bg" Background="{TemplateBinding Background}" CornerRadius="10">
-                        <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
-                                           VerticalAlignment="Center"
-                                           Margin="{TemplateBinding Padding}"/>
+                    <Grid>
+                        <Border x:Name="Indicator"
+                                Width="3" HorizontalAlignment="Left" Margin="0,7,0,7"
+                                CornerRadius="2"
+                                Background="{DynamicResource SidebarActiveBrush}"
+                                Visibility="Collapsed"/>
+                        <Border x:Name="Bg" Margin="6,0,6,0" CornerRadius="10">
+                            <Border.Background>
+                                <SolidColorBrush Color="Transparent"/>
+                            </Border.Background>
+                        </Border>
+                        <ContentPresenter Margin="{TemplateBinding Padding}"
+                                           HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                           VerticalAlignment="Center"/>
+                    </Grid>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background.Color"
+                                                        To="#14FFFFFF" Duration="0:0:0.16"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background.Color"
+                                                        To="Transparent" Duration="0:0:0.20"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                        <Trigger Property="Tag" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="{DynamicResource SidebarActivePillBrush}"/>
+                            <Setter TargetName="Indicator" Property="Visibility" Value="Visible"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FluentFocusVisualStyle}"/>
+    </Style>
+
+    <!--
+        Botón icónico redondo del header (Microsoft 365): notificaciones/configuración/
+        avatar. Fondo transparente, se ilumina con un overlay translúcido claro en
+        hover/pressed (el header vive sobre SidebarBackgroundBrush, oscuro, en ambos
+        temas), foco visible.
+    -->
+    <Style x:Key="HeaderIconButtonStyle" TargetType="Button">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Width" Value="36"/>
+        <Setter Property="Height" Value="36"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="BorderThickness" Value="0"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="18" Width="{TemplateBinding Width}" Height="{TemplateBinding Height}">
+                        <Border.Background>
+                            <SolidColorBrush Color="Transparent"/>
+                        </Border.Background>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
                         <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="#150E4C92"/>
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background.Color" To="#1FFFFFFF" Duration="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background.Color" To="Transparent" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
-                        <Trigger Property="Tag" Value="True">
-                            <Setter TargetName="Bg" Property="Background" Value="{StaticResource SidebarActiveBrush}"/>
+                        <Trigger Property="IsPressed" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#33FFFFFF"/>
+                        </Trigger>
+                        <Trigger Property="IsEnabled" Value="False">
+                            <Setter Property="Opacity" Value="0.45"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FluentFocusVisualStyle}"/>
+    </Style>
+
+    <!--
+        Botón del bloque de usuario en el header (avatar + nombre + chevron): misma
+        familia visual que HeaderIconButtonStyle pero ancho automático y esquinas de
+        píldora, para envolver contenido compuesto (ver ShellView.xaml).
+    -->
+    <Style x:Key="HeaderUserButtonStyle" TargetType="Button" BasedOn="{StaticResource HeaderIconButtonStyle}">
+        <Setter Property="Width" Value="Auto"/>
+        <Setter Property="Height" Value="40"/>
+        <Setter Property="Padding" Value="6,4,10,4"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="Button">
+                    <Border x:Name="Bg" CornerRadius="20" Padding="{TemplateBinding Padding}">
+                        <Border.Background>
+                            <SolidColorBrush Color="Transparent"/>
+                        </Border.Background>
+                        <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background.Color" To="#1FFFFFFF" Duration="0:0:0.15"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <ColorAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Background.Color" To="Transparent" Duration="0:0:0.2"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
                         </Trigger>
                     </ControlTemplate.Triggers>
                 </ControlTemplate>
@@ -128,26 +366,61 @@
         </Setter>
     </Style>
 
+    <!--
+        Toggle claro/oscuro: ToggleButton de texto (no glifo) a propósito — se evita
+        cualquier codepoint Segoe Fluent/MDL2 de sol/luna que no se pudiera verificar
+        con certeza (el encargo pide no adivinar codepoints); un rótulo de texto
+        corto además cumple mejor la accesibilidad (nunca depender solo de un icono).
+    -->
+    <Style x:Key="ThemeToggleButtonStyle" TargetType="ToggleButton">
+        <Setter Property="Background" Value="Transparent"/>
+        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
+        <Setter Property="FontSize" Value="11.5"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="Padding" Value="12,7"/>
+        <Setter Property="Cursor" Value="Hand"/>
+        <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource HeaderDividerBrush}"/>
+        <Setter Property="Template">
+            <Setter.Value>
+                <ControlTemplate TargetType="ToggleButton">
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
+                            BorderBrush="{TemplateBinding BorderBrush}"
+                            BorderThickness="{TemplateBinding BorderThickness}"
+                            CornerRadius="16">
+                        <ContentPresenter Margin="{TemplateBinding Padding}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                    </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bg" Property="Background" Value="#1FFFFFFF"/>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
+                </ControlTemplate>
+            </Setter.Value>
+        </Setter>
+        <Setter Property="FocusVisualStyle" Value="{StaticResource FluentFocusVisualStyle}"/>
+    </Style>
+
     <!-- ===================== TextBox ===================== -->
     <!--
-        Redondeado (~6px). Soporte de placeholder: técnica elegida es reutilizar la
-        propiedad Tag (ya libre de otro uso en un TextBox simple) como texto de
-        placeholder (p.ej. TextBox con Tag="Buscar equipo..."), superpuesto mediante un
-        TextBlock dentro del ControlTemplate, visible únicamente cuando Text está vacío.
-        Se documenta aquí en vez de crear una subclase Controls:PlaceholderTextBox porque
-        así el placeholder queda disponible en CUALQUIER TextBox de la app sin tener que
-        recordar usar un control distinto (menos superficie de error para la Fase 5).
+        Redondeado (TextBoxCornerRadius, 8px). Soporte de placeholder: se reutiliza la
+        propiedad Tag como texto de placeholder (p.ej. TextBox con Tag="Buscar
+        equipo..."), superpuesto mediante un TextBlock, visible únicamente cuando Text
+        está vacío. Foco: transición de color de borde animada (antes era un salto
+        instantáneo de BorderBrush/BorderThickness).
     -->
     <Style x:Key="AppTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
+        <Setter Property="Padding" Value="10,8"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="CaretBrush" Value="{StaticResource TextDarkBrush}"/>
-        <Setter Property="SelectionBrush" Value="{StaticResource SecondaryBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource TextDarkBrush}"/>
+        <Setter Property="SelectionBrush" Value="{DynamicResource SecondaryBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="TextBox">
@@ -161,7 +434,7 @@
                                        Text="{TemplateBinding Tag}"
                                        Margin="{TemplateBinding Padding}"
                                        VerticalAlignment="Center"
-                                       Foreground="{StaticResource TextLightBrush}"
+                                       Foreground="{DynamicResource TextLightBrush}"
                                        FontFamily="{TemplateBinding FontFamily}"
                                        FontSize="{TemplateBinding FontSize}"
                                        IsHitTestVisible="False"
@@ -172,8 +445,11 @@
                         </Grid>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#94A3B8"/>
+                        </Trigger>
                         <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SecondaryBrush}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
                             <Setter TargetName="Bd" Property="BorderThickness" Value="1.5"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -196,11 +472,10 @@
     <Style x:Key="AppPasswordBoxStyle" TargetType="PasswordBox">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="15"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
-        <Setter Property="Padding" Value="10,8"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
+        <Setter Property="Padding" Value="12,10"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="PasswordBox">
@@ -214,8 +489,11 @@
                                       VerticalAlignment="Center"/>
                     </Border>
                     <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="#94A3B8"/>
+                        </Trigger>
                         <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{StaticResource SecondaryBrush}"/>
+                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
                             <Setter TargetName="Bd" Property="BorderThickness" Value="1.5"/>
                         </Trigger>
                         <Trigger Property="IsEnabled" Value="False">
@@ -231,30 +509,33 @@
     <!-- ===================== ComboBox ===================== -->
     <Style x:Key="AppComboBoxStyle" TargetType="ComboBox">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        <Setter Property="FontSize" Value="13"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
-        <Setter Property="Padding" Value="10,6"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="FontSize" Value="13.5"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
+        <Setter Property="Padding" Value="10,7"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
     </Style>
     <Style TargetType="ComboBox" BasedOn="{StaticResource AppComboBoxStyle}"/>
 
     <!-- ===================== DataGrid ===================== -->
-    <!-- Puerto de SwingUtils.formatearTabla(): fila 34px, encabezado 38px fondo Primary/texto
-         blanco negrita, selección Secondary, grid horizontal únicamente, celdas con padding
-         12px horizontal. -->
+    <!--
+        Rediseño: header GRIS CLARO con texto oscuro (antes: fondo PrimaryBrush sólido
+        con texto blanco) + filas blancas + hover sutil + separadores suaves — el
+        lenguaje visual de tabla de Fluent/Azure Portal en vez de la tabla "brand
+        pesado" de FlatLaf/Java.
+    -->
     <Style x:Key="AppDataGridColumnHeaderStyle" TargetType="DataGridColumnHeader">
-        <Setter Property="Background" Value="{StaticResource PrimaryBrush}"/>
-        <Setter Property="Foreground" Value="White"/>
+        <Setter Property="Background" Value="{DynamicResource TableHeaderBackgroundBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
-        <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="FontSize" Value="13"/>
+        <Setter Property="FontWeight" Value="SemiBold"/>
+        <Setter Property="FontSize" Value="12.5"/>
         <Setter Property="Height" Value="{StaticResource DataGridHeaderHeight}"/>
         <Setter Property="Padding" Value="12,0,12,0"/>
         <Setter Property="HorizontalContentAlignment" Value="Left"/>
-        <Setter Property="BorderBrush" Value="{StaticResource PrimaryBrush}"/>
-        <Setter Property="BorderThickness" Value="0,0,0,0"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
+        <Setter Property="BorderThickness" Value="0,0,0,1"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
     </Style>
 
@@ -262,7 +543,7 @@
         <Setter Property="Padding" Value="{StaticResource DataGridCellPadding}"/>
         <Setter Property="BorderThickness" Value="0"/>
         <Setter Property="Background" Value="Transparent"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="VerticalAlignment" Value="Center"/>
@@ -279,15 +560,24 @@
         </Setter>
         <Style.Triggers>
             <Trigger Property="IsSelected" Value="True">
-                <Setter Property="Background" Value="{StaticResource SecondaryBrush}"/>
+                <Setter Property="Background" Value="{DynamicResource SecondaryBrush}"/>
                 <Setter Property="Foreground" Value="White"/>
             </Trigger>
         </Style.Triggers>
     </Style>
 
+    <!-- Fila con hover sutil (HoverBackgroundBrush) — antes no existía ningún estado de hover en la tabla. -->
     <Style x:Key="AppDataGridRowStyle" TargetType="DataGridRow">
         <Setter Property="Height" Value="{StaticResource DataGridRowHeight}"/>
-        <Setter Property="Background" Value="White"/>
+        <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+        <Style.Triggers>
+            <Trigger Property="IsMouseOver" Value="True">
+                <Setter Property="Background" Value="{DynamicResource HoverBackgroundBrush}"/>
+            </Trigger>
+            <Trigger Property="IsSelected" Value="True">
+                <Setter Property="Background" Value="{DynamicResource SecondaryBrush}"/>
+            </Trigger>
+        </Style.Triggers>
     </Style>
 
     <Style x:Key="AppDataGridStyle" TargetType="DataGrid">
@@ -300,14 +590,14 @@
         <Setter Property="SelectionMode" Value="Single"/>
         <Setter Property="SelectionUnit" Value="FullRow"/>
         <Setter Property="GridLinesVisibility" Value="Horizontal"/>
-        <Setter Property="HorizontalGridLinesBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="HorizontalGridLinesBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="RowHeight" Value="{StaticResource DataGridRowHeight}"/>
         <Setter Property="ColumnHeaderHeight" Value="{StaticResource DataGridHeaderHeight}"/>
         <Setter Property="ColumnHeaderStyle" Value="{StaticResource AppDataGridColumnHeaderStyle}"/>
         <Setter Property="CellStyle" Value="{StaticResource AppDataGridCellStyle}"/>
         <Setter Property="RowStyle" Value="{StaticResource AppDataGridRowStyle}"/>
-        <Setter Property="Background" Value="White"/>
-        <Setter Property="BorderBrush" Value="{StaticResource BorderLightBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="BorderThickness" Value="1"/>
         <Setter Property="RowHeaderWidth" Value="0"/>
         <Setter Property="HeadersVisibility" Value="Column"/>
@@ -315,25 +605,55 @@
     <Style TargetType="DataGrid" BasedOn="{StaticResource AppDataGridStyle}"/>
 
     <!-- ===================== RoundedCard ===================== -->
+    <!--
+        Tarjeta base de toda la app (StatCard, paneles de Configuración, etc.): radio
+        14px, sombra suave. Rediseño: elevación animada en hover (la sombra se
+        intensifica ligeramente, ~180ms) — "TARJETAS: ... animación hover, elevación"
+        del encargo. RoundedCard es un ContentControl normal, así que IsMouseOver
+        funciona igual que en cualquier otro control.
+    -->
     <Style TargetType="{x:Type controls:RoundedCard}">
-        <Setter Property="Background" Value="{StaticResource CardBrush}"/>
+        <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
         <Setter Property="Padding" Value="{StaticResource CardPadding}"/>
         <Setter Property="CornerRadius" Value="{StaticResource CardCornerRadius}"/>
         <Setter Property="SnapsToDevicePixels" Value="True"/>
         <Setter Property="Template">
             <Setter.Value>
                 <ControlTemplate TargetType="{x:Type controls:RoundedCard}">
-                    <Border Background="{TemplateBinding Background}"
+                    <Border x:Name="Bg"
+                            Background="{TemplateBinding Background}"
                             CornerRadius="{TemplateBinding CornerRadius}"
                             BorderBrush="{TemplateBinding BorderBrush}"
                             BorderThickness="{TemplateBinding BorderThickness}"
                             Padding="{TemplateBinding Padding}"
                             SnapsToDevicePixels="True">
                         <Border.Effect>
-                            <DropShadowEffect Color="#000000" Opacity="0.08" BlurRadius="10" ShadowDepth="2" Direction="270"/>
+                            <DropShadowEffect x:Name="Shadow" Color="#000000" Opacity="0.08" BlurRadius="10" ShadowDepth="2" Direction="270"/>
                         </Border.Effect>
                         <ContentPresenter/>
                     </Border>
+                    <ControlTemplate.Triggers>
+                        <Trigger Property="IsMouseOver" Value="True">
+                            <Trigger.EnterActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Effect.(DropShadowEffect.BlurRadius)" To="18" Duration="0:0:0.18"/>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Effect.(DropShadowEffect.ShadowDepth)" To="4" Duration="0:0:0.18"/>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Effect.(DropShadowEffect.Opacity)" To="0.14" Duration="0:0:0.18"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.EnterActions>
+                            <Trigger.ExitActions>
+                                <BeginStoryboard>
+                                    <Storyboard>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Effect.(DropShadowEffect.BlurRadius)" To="10" Duration="0:0:0.22"/>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Effect.(DropShadowEffect.ShadowDepth)" To="2" Duration="0:0:0.22"/>
+                                        <DoubleAnimation Storyboard.TargetName="Bg" Storyboard.TargetProperty="Effect.(DropShadowEffect.Opacity)" To="0.08" Duration="0:0:0.22"/>
+                                    </Storyboard>
+                                </BeginStoryboard>
+                            </Trigger.ExitActions>
+                        </Trigger>
+                    </ControlTemplate.Triggers>
                 </ControlTemplate>
             </Setter.Value>
         </Setter>

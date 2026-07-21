@@ -2,23 +2,40 @@
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
     <!--
-        Paleta institucional UNA Puno. Puerto 1:1 de config/AppColors.java (Fase 4), con
-        adiciones explícitas (con nombre, no hardcodeadas ad hoc como hacía Swing en cada
-        pantalla) para el sidebar, las filas de préstamo vencido, y los colores por
-        EstadoEquipo — así toda la app en Fase 5 consume exactamente los mismos recursos.
+        Paleta institucional UNA Puno — MODO CLARO.
+
+        Rediseño visual profesional (40% Fluent/Windows 11 + 35% macOS Sonoma + 15%
+        Azure Portal + 10% Visual Studio 2022), conservando la identidad azul+dorado
+        institucional pero modernizada a tonos corporativos no saturados.
+
+        IMPORTANTE para quien edite este archivo: se mantienen EXACTAMENTE los mismos
+        nombres de recurso que ya consumen las 5 pantallas + diálogos (PrimaryBrush,
+        SecondaryBrush, AccentBrush, SuccessBrush, WarningBrush, DangerBrush,
+        BackgroundBrush, CardBrush, TextDarkBrush, TextLightBrush, SidebarBackgroundBrush,
+        SidebarActiveBrush, EstadoXBrush, RowOverdueXBrush, WhiteBrush, BorderLightBrush)
+        — solo cambian los valores hex y se añaden recursos nuevos al final. Esto es a
+        propósito: renombrar cualquiera de esos rompería bindings StaticResource ya
+        verificados. El modo oscuro equivalente vive en Colors.Dark.xaml, con las MISMAS
+        claves (ver Theming/ThemeService.cs, que intercambia este ResourceDictionary
+        completo en caliente).
     -->
 
-    <!-- Paleta base (idéntica a AppColors.java) -->
-    <Color x:Key="PrimaryColor">#1a3a5c</Color>
-    <Color x:Key="SecondaryColor">#2e6da4</Color>
-    <Color x:Key="AccentColor">#f0a500</Color>
-    <Color x:Key="SuccessColor">#28a745</Color>
-    <Color x:Key="WarningColor">#ffc107</Color>
-    <Color x:Key="DangerColor">#dc3545</Color>
-    <Color x:Key="BackgroundColor">#f5f6fa</Color>
-    <Color x:Key="CardColor">#ffffff</Color>
-    <Color x:Key="TextDarkColor">#2c3e50</Color>
-    <Color x:Key="TextLightColor">#7f8c8d</Color>
+    <!-- Paleta base -->
+    <Color x:Key="PrimaryColor">#0F2B5B</Color>
+    <!-- Azul oscuro institucional -->
+    <Color x:Key="SecondaryColor">#2563EB</Color>
+    <!-- Azul Microsoft -->
+    <Color x:Key="AccentColor">#F4B400</Color>
+    <!-- Dorado institucional -->
+    <Color x:Key="SuccessColor">#22C55E</Color>
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="DangerColor">#EF4444</Color>
+    <Color x:Key="BackgroundColor">#F5F7FA</Color>
+    <Color x:Key="CardColor">#FFFFFF</Color>
+    <Color x:Key="TextDarkColor">#0F172A</Color>
+    <!-- Texto principal -->
+    <Color x:Key="TextLightColor">#64748B</Color>
+    <!-- Texto secundario -->
 
     <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
     <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
@@ -32,40 +49,60 @@
     <SolidColorBrush x:Key="TextLightBrush" Color="{StaticResource TextLightColor}"/>
 
     <!--
-        Sidebar / barra superior: en Java estos colores vivían hardcodeados directo en
-        MainFrame.crearSidebar()/crearTopBar() (0x0A1D37, 0x071930, 0x0E4C92) sin pasar
-        por AppColors. Aquí quedan centralizados con nombre. Se usa un único
-        SidebarBackgroundBrush (0x0A1D37) para sidebar y topbar (Java usaba dos tonos muy
-        cercanos -0x0A1D37 y 0x071930- sin razón funcional aparente).
+        Sidebar / barra superior estilo "chrome" oscuro (Azure Portal / VS2022): un
+        único tono (el azul institucional oscuro) para sidebar y topbar, y el azul
+        Microsoft como color de acento activo/indicador — reemplaza los dos tonos casi
+        idénticos que usaba Java (0x0A1D37 / 0x071930) sin razón funcional aparente.
     -->
-    <Color x:Key="SidebarBackgroundColor">#0A1D37</Color>
-    <Color x:Key="SidebarActiveColor">#0E4C92</Color>
+    <Color x:Key="SidebarBackgroundColor">#0F2B5B</Color>
+    <Color x:Key="SidebarActiveColor">#2563EB</Color>
     <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}"/>
     <SolidColorBrush x:Key="SidebarActiveBrush" Color="{StaticResource SidebarActiveColor}"/>
 
-    <!-- Resaltado de filas de préstamo vencido en tablas (Historial/Préstamos, Fase 5) -->
-    <Color x:Key="RowOverdueWarningColor">#fff2cc</Color>
+    <!-- Resaltado de filas de préstamo vencido en tablas (Historial/Préstamos) -->
+    <Color x:Key="RowOverdueWarningColor">#FEF3C7</Color>
     <!-- 7-14 días -->
-    <Color x:Key="RowOverdueDangerColor">#ffcccc</Color>
+    <Color x:Key="RowOverdueDangerColor">#FEE2E2</Color>
     <!-- >14 días -->
     <SolidColorBrush x:Key="RowOverdueWarningBrush" Color="{StaticResource RowOverdueWarningColor}"/>
     <SolidColorBrush x:Key="RowOverdueDangerBrush" Color="{StaticResource RowOverdueDangerColor}"/>
 
-    <!--
-        Colores por EstadoEquipo, con nombre como recurso (idénticos a
-        EstadoEquipoExtensions.ColorHex() en SisLabTopo.Domain). Se declaran aquí también
-        como recursos WPF para que XAML pueda referenciarlos directamente sin pasar por
-        un converter cuando el estado ya se conoce en diseño; StatusBadge / los
-        converters de Fase 5 los usan para el caso dinámico.
-    -->
-    <SolidColorBrush x:Key="EstadoBuenoBrush" Color="#28a745"/>
-    <SolidColorBrush x:Key="EstadoRegularBrush" Color="#ffc107"/>
-    <SolidColorBrush x:Key="EstadoMaloBrush" Color="#dc3545"/>
-    <SolidColorBrush x:Key="EstadoNuevoBrush" Color="#17a2b8"/>
-    <SolidColorBrush x:Key="EstadoDesusoBrush" Color="#6c757d"/>
-    <SolidColorBrush x:Key="EstadoChatarraBrush" Color="#721c24"/>
+    <!-- Colores por EstadoEquipo (idénticos en espíritu a EstadoEquipoExtensions.ColorHex() en Domain, modernizados) -->
+    <SolidColorBrush x:Key="EstadoBuenoBrush" Color="#22C55E"/>
+    <SolidColorBrush x:Key="EstadoRegularBrush" Color="#F59E0B"/>
+    <SolidColorBrush x:Key="EstadoMaloBrush" Color="#EF4444"/>
+    <SolidColorBrush x:Key="EstadoNuevoBrush" Color="#0EA5E9"/>
+    <SolidColorBrush x:Key="EstadoDesusoBrush" Color="#64748B"/>
+    <SolidColorBrush x:Key="EstadoChatarraBrush" Color="#7F1D1D"/>
 
     <SolidColorBrush x:Key="WhiteBrush" Color="White"/>
-    <SolidColorBrush x:Key="BorderLightBrush" Color="#e0e0e0"/>
+    <SolidColorBrush x:Key="BorderLightBrush" Color="#E2E8F0"/>
+
+    <!--
+        ===================== Recursos NUEVOS (rediseño) =====================
+        Estados de interacción (hover/pressed/focus) y superficies de tabla que Java/
+        Fase 4-5 no necesitaban con nombre propio porque los estilos antiguos no
+        distinguían estos estados. Con nombre aquí para que Controls.xaml (botones,
+        TextBox, DataGrid, sidebar) y las vistas los consuman de forma consistente en
+        vez de hardcodear hex sueltos.
+    -->
+    <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#F1F5F9"/>
+    <!-- hover claro sobre superficies blancas (filas de tabla, botones secundarios) -->
+    <SolidColorBrush x:Key="PressedBackgroundBrush" Color="#E2E8F0"/>
+    <SolidColorBrush x:Key="FocusBorderBrush" Color="#2563EB"/>
+    <SolidColorBrush x:Key="TableHeaderBackgroundBrush" Color="#F8FAFC"/>
+
+    <!-- Sidebar oscuro: overlays translúcidos para hover/selección (macOS/Fluent NavigationView) -->
+    <SolidColorBrush x:Key="SidebarHoverBrush" Color="#14FFFFFF"/>
+    <SolidColorBrush x:Key="SidebarActivePillBrush" Color="#262563EB"/>
+    <SolidColorBrush x:Key="SidebarIconActiveBrush" Color="White"/>
+    <SolidColorBrush x:Key="SidebarIconInactiveBrush" Color="#7C96BE"/>
+    <SolidColorBrush x:Key="SidebarTextActiveBrush" Color="White"/>
+    <SolidColorBrush x:Key="SidebarTextInactiveBrush" Color="#B7C4D9"/>
+    <SolidColorBrush x:Key="SidebarMutedTextBrush" Color="#7090B0"/>
+
+    <!-- Header oscuro (topbar): texto/iconos secundarios legibles sobre SidebarBackgroundBrush -->
+    <SolidColorBrush x:Key="HeaderMutedTextBrush" Color="#A9BEDC"/>
+    <SolidColorBrush x:Key="HeaderDividerBrush" Color="#26FFFFFF"/>
 
 </ResourceDictionary>

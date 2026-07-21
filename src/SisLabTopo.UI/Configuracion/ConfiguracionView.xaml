@@ -14,7 +14,7 @@
         completo, igual que el "wrapper" de Java), con cambio de contraseña de
         administrador. Mensajes de éxito/error inline (nunca un MessageBox bloqueante).
     -->
-    <Grid Background="{StaticResource BackgroundBrush}">
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <controls:RoundedCard HorizontalAlignment="Left" VerticalAlignment="Top" Width="480">
             <StackPanel IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
                 <TextBlock Text="Cambiar Contraseña de Administrador" Style="{StaticResource TitleStyle}" FontSize="18"/>
@@ -29,7 +29,7 @@
                 <PasswordBox x:Name="PasswordNueva" Margin="0,0,0,2"
                              PasswordChanged="PasswordNueva_PasswordChanged"/>
                 <TextBlock Text="{Binding MensajeErrorNueva}"
-                           Style="{StaticResource SmallStyle}" FontWeight="Bold" Foreground="{StaticResource DangerBrush}"
+                           Style="{StaticResource SmallStyle}" FontWeight="Bold" Foreground="{DynamicResource DangerBrush}"
                            Margin="0,0,0,12"
                            Visibility="{Binding MensajeErrorNueva, Converter={StaticResource StringToVisibilityConverter}}"/>
 
@@ -37,16 +37,16 @@
                 <PasswordBox x:Name="PasswordConfirmar" Margin="0,0,0,2"
                              PasswordChanged="PasswordConfirmar_PasswordChanged"/>
                 <TextBlock Text="{Binding MensajeErrorConfirmar}"
-                           Style="{StaticResource SmallStyle}" FontWeight="Bold" Foreground="{StaticResource DangerBrush}"
+                           Style="{StaticResource SmallStyle}" FontWeight="Bold" Foreground="{DynamicResource DangerBrush}"
                            Margin="0,0,0,12"
                            Visibility="{Binding MensajeErrorConfirmar, Converter={StaticResource StringToVisibilityConverter}}"/>
 
                 <TextBlock Text="{Binding MensajeExito}"
-                           Style="{StaticResource BodyStyle}" FontWeight="Bold" Foreground="{StaticResource SuccessBrush}"
+                           Style="{StaticResource BodyStyle}" FontWeight="Bold" Foreground="{DynamicResource SuccessBrush}"
                            TextWrapping="Wrap" Margin="0,4,0,8"
                            Visibility="{Binding MensajeExito, Converter={StaticResource StringToVisibilityConverter}}"/>
                 <TextBlock Text="{Binding MensajeError}"
-                           Style="{StaticResource BodyStyle}" FontWeight="Bold" Foreground="{StaticResource DangerBrush}"
+                           Style="{StaticResource BodyStyle}" FontWeight="Bold" Foreground="{DynamicResource DangerBrush}"
                            TextWrapping="Wrap" Margin="0,4,0,8"
                            Visibility="{Binding MensajeError, Converter={StaticResource StringToVisibilityConverter}}"/>
 

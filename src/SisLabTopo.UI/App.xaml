@@ -28,6 +28,7 @@
             <converters:InverseBoolConverter x:Key="InverseBoolConverter"/>
             <converters:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
             <converters:StringToVisibilityConverter x:Key="StringToVisibilityConverter"/>
+            <converters:BoolToThemeLabelConverter x:Key="BoolToThemeLabelConverter"/>
             <converters:ViewModelIsTypeConverter x:Key="ViewModelIsTypeConverter"/>
             <converters:EstadoEquipoToBrushConverter x:Key="EstadoEquipoToBrushConverter"/>
             <converters:EstadoEquipoToTextConverter x:Key="EstadoEquipoToTextConverter"/>

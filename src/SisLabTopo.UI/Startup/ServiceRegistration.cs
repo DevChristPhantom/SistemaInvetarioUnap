@@ -9,6 +9,7 @@ using SisLabTopo.UI.Navigation;
 using SisLabTopo.UI.PasswordRecovery;
 using SisLabTopo.UI.Prestamos;
 using SisLabTopo.UI.Shell;
+using SisLabTopo.UI.Theming;
 
 namespace SisLabTopo.UI.Startup;
 
@@ -40,6 +41,12 @@ public static class ServiceRegistration
     public static IServiceCollection AddSisLabTopoUi(this IServiceCollection services)
     {
         services.AddScoped<INavigationService, NavigationService>();
+
+        // Rediseño visual: alterna en caliente entre Themes/Colors.xaml y
+        // Themes/Colors.Dark.xaml (ver Theming/ThemeService). Singleton porque el tema
+        // aplicado es un estado único de toda la sesión de la aplicación, igual que
+        // IDialogService más abajo.
+        services.AddSingleton<IThemeService, ThemeService>();
 
         // Ventanas raíz (Login/Shell): registradas Transient -- NO Scoped -- a propósito.
         //

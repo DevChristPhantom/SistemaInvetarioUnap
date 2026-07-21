@@ -29,6 +29,20 @@
   <ItemGroup>
     <Resource Include="Assets\Logo_UNAP.png" />
     <Resource Include="Assets\Logo_Minas.png" />
+
+    <!--
+      Rediseño visual (Fase de diseño UI): iconos heredados 1:1 de la app Java
+      (ui/MainFrame.java líneas 299-305, ver mapeo en Shell/ShellView.xaml), copiados
+      tal cual sin editar. Se usan como OpacityMask sobre un Rectangle en el sidebar
+      para poder "teñirlos" de blanco/gris-azulado según el estado activo/inactivo
+      directamente desde XAML/tema, igual que hacía SwingUtils.cargarIconoTintado en
+      Java pero sin fabricar un asset nuevo.
+    -->
+    <Resource Include="Assets\Icons\tablero.png" />
+    <Resource Include="Assets\Icons\nivel-laser.png" />
+    <Resource Include="Assets\Icons\pagar.png" />
+    <Resource Include="Assets\Icons\archivo.png" />
+    <Resource Include="Assets\Icons\config.png" />
   </ItemGroup>
 
 </Project>

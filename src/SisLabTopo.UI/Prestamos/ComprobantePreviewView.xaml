@@ -28,7 +28,7 @@
 
             <TextBlock Text="{Binding MensajeError}"
                        Style="{StaticResource BodyStyle}"
-                       Foreground="{StaticResource DangerBrush}"
+                       Foreground="{DynamicResource DangerBrush}"
                        FontWeight="Bold"
                        TextWrapping="Wrap"
                        HorizontalAlignment="Center" VerticalAlignment="Center" Margin="20"

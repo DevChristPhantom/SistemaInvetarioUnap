@@ -73,9 +73,9 @@ public sealed class EstadoPrestamoToBrushConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) => value switch
     {
-        EstadoPrestamo.Activo => BrushFromHex.Convert("#2e6da4"),
-        EstadoPrestamo.Devuelto => BrushFromHex.Convert("#28a745"),
-        EstadoPrestamo.Vencido => BrushFromHex.Convert("#dc3545"),
+        EstadoPrestamo.Activo => BrushFromHex.Convert("#2563EB"),
+        EstadoPrestamo.Devuelto => BrushFromHex.Convert("#22C55E"),
+        EstadoPrestamo.Vencido => BrushFromHex.Convert("#EF4444"),
         _ => Brushes.Gray
     };
 
@@ -104,7 +104,7 @@ public sealed class EstadoPrestamoToTextConverter : IValueConverter
 public sealed class DisponibilidadToBrushConverter : IValueConverter
 {
     public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
-        value is true ? BrushFromHex.Convert("#28a745") : BrushFromHex.Convert("#dc3545");
+        value is true ? BrushFromHex.Convert("#22C55E") : BrushFromHex.Convert("#EF4444");
 
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();

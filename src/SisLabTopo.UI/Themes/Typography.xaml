@@ -1,44 +1,52 @@
 <ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
                     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
 
-    <!-- Puerto 1:1 de config/AppFonts.java. Familia "Segoe UI" para todo, "Consolas" para MonoStyle. -->
+    <!--
+        Rediseño visual: "Segoe UI Variable" (tipografía moderna de Windows 11/Fluent)
+        con fallback automático a "Segoe UI" si la variante Variable no está instalada
+        en la máquina — WPF prueba la lista de FontFamily en orden y usa la primera
+        disponible, así que esto NUNCA falla ni requiere detección manual: si esta
+        estación no tiene "Segoe UI Variable" instalada, cae a "Segoe UI" (que sí viene
+        con Windows) sin ningún cambio de comportamiento visible salvo la tipografía.
+        "Consolas" se mantiene para MonoStyle (código/números tabulares, sin cambios).
+    -->
 
-    <FontFamily x:Key="AppFontFamily">Segoe UI</FontFamily>
+    <FontFamily x:Key="AppFontFamily">Segoe UI Variable, Segoe UI</FontFamily>
     <FontFamily x:Key="AppMonoFontFamily">Consolas</FontFamily>
 
     <Style x:Key="TitleStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="20"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
     </Style>
 
     <Style x:Key="SubtitleStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="14"/>
         <Setter Property="FontWeight" Value="Bold"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
     </Style>
 
     <Style x:Key="BodyStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="13"/>
         <Setter Property="FontWeight" Value="Normal"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
     </Style>
 
     <Style x:Key="SmallStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="11"/>
         <Setter Property="FontWeight" Value="Normal"/>
-        <Setter Property="Foreground" Value="{StaticResource TextLightBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextLightBrush}"/>
     </Style>
 
     <Style x:Key="MonoStyle" TargetType="TextBlock">
         <Setter Property="FontFamily" Value="{StaticResource AppMonoFontFamily}"/>
         <Setter Property="FontSize" Value="12"/>
         <Setter Property="FontWeight" Value="Normal"/>
-        <Setter Property="Foreground" Value="{StaticResource TextDarkBrush}"/>
+        <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
     </Style>
 
 </ResourceDictionary>

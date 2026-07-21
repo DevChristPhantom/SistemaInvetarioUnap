@@ -1,0 +1,91 @@
+<ResourceDictionary xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+                    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <!--
+        Paleta institucional UNA Puno — MODO OSCURO.
+
+        Mismas CLAVES de recurso que Themes/Colors.xaml (a propósito: Theming/
+        ThemeService intercambia el ResourceDictionary completo en
+        Application.Current.Resources.MergedDictionaries en tiempo real, así que toda
+        vista que ya consume {StaticResource TextDarkBrush}, {StaticResource CardBrush},
+        etc. cambia de aspecto automáticamente sin tocar ni una vista). Los valores aquí
+        son los equivalentes oscuros: fondo/tarjetas oscuros, texto claro, mismo azul
+        Microsoft + dorado institucional ajustados para contraste WCAG AA sobre fondo
+        oscuro (el dorado/verde/ámbar/rojo se mantienen casi iguales — ya leen bien
+        sobre superficies oscuras; el azul primario se aclara un poco para que los
+        botones no se "fundan" con el fondo).
+
+        Alcance verificado visualmente en esta fase: Shell (sidebar + header) y Login.
+        Dashboard hereda estos recursos automáticamente (usa los mismos StaticResource
+        que Equipos/Préstamos/Historial/Configuración), pero SOLO Shell/Login/Dashboard
+        fueron revisados pixel a pixel en modo oscuro — Equipos/Préstamos/Historial/
+        Configuración probablemente ya se vean razonables (mismos recursos, mismos
+        controles de Controls.xaml) pero NO se verificaron visualmente uno por uno:
+        pendiente de pulido fino para la Fase B.
+    -->
+
+    <!-- Paleta base -->
+    <Color x:Key="PrimaryColor">#3B82F6</Color>
+    <!-- Azul institucional aclarado para contraste sobre fondo oscuro -->
+    <Color x:Key="SecondaryColor">#2563EB</Color>
+    <Color x:Key="AccentColor">#F4B400</Color>
+    <Color x:Key="SuccessColor">#22C55E</Color>
+    <Color x:Key="WarningColor">#F59E0B</Color>
+    <Color x:Key="DangerColor">#F87171</Color>
+    <Color x:Key="BackgroundColor">#0B1220</Color>
+    <Color x:Key="CardColor">#16213A</Color>
+    <Color x:Key="TextDarkColor">#F1F5F9</Color>
+    <!-- "TextDark" = texto principal; en oscuro es un color CLARO a propósito (mismo rol, misma clave) -->
+    <Color x:Key="TextLightColor">#94A3B8</Color>
+    <!-- Texto secundario -->
+
+    <SolidColorBrush x:Key="PrimaryBrush" Color="{StaticResource PrimaryColor}"/>
+    <SolidColorBrush x:Key="SecondaryBrush" Color="{StaticResource SecondaryColor}"/>
+    <SolidColorBrush x:Key="AccentBrush" Color="{StaticResource AccentColor}"/>
+    <SolidColorBrush x:Key="SuccessBrush" Color="{StaticResource SuccessColor}"/>
+    <SolidColorBrush x:Key="WarningBrush" Color="{StaticResource WarningColor}"/>
+    <SolidColorBrush x:Key="DangerBrush" Color="{StaticResource DangerColor}"/>
+    <SolidColorBrush x:Key="BackgroundBrush" Color="{StaticResource BackgroundColor}"/>
+    <SolidColorBrush x:Key="CardBrush" Color="{StaticResource CardColor}"/>
+    <SolidColorBrush x:Key="TextDarkBrush" Color="{StaticResource TextDarkColor}"/>
+    <SolidColorBrush x:Key="TextLightBrush" Color="{StaticResource TextLightColor}"/>
+
+    <!-- Sidebar / topbar: un tono aún más oscuro que el fondo de contenido, para que siga leyéndose como un "riel" separado -->
+    <Color x:Key="SidebarBackgroundColor">#050B14</Color>
+    <Color x:Key="SidebarActiveColor">#3B82F6</Color>
+    <SolidColorBrush x:Key="SidebarBackgroundBrush" Color="{StaticResource SidebarBackgroundColor}"/>
+    <SolidColorBrush x:Key="SidebarActiveBrush" Color="{StaticResource SidebarActiveColor}"/>
+
+    <Color x:Key="RowOverdueWarningColor">#4A3B12</Color>
+    <Color x:Key="RowOverdueDangerColor">#4A1E1E</Color>
+    <SolidColorBrush x:Key="RowOverdueWarningBrush" Color="{StaticResource RowOverdueWarningColor}"/>
+    <SolidColorBrush x:Key="RowOverdueDangerBrush" Color="{StaticResource RowOverdueDangerColor}"/>
+
+    <SolidColorBrush x:Key="EstadoBuenoBrush" Color="#22C55E"/>
+    <SolidColorBrush x:Key="EstadoRegularBrush" Color="#F59E0B"/>
+    <SolidColorBrush x:Key="EstadoMaloBrush" Color="#F87171"/>
+    <SolidColorBrush x:Key="EstadoNuevoBrush" Color="#38BDF8"/>
+    <SolidColorBrush x:Key="EstadoDesusoBrush" Color="#94A3B8"/>
+    <SolidColorBrush x:Key="EstadoChatarraBrush" Color="#B91C1C"/>
+
+    <SolidColorBrush x:Key="WhiteBrush" Color="White"/>
+    <SolidColorBrush x:Key="BorderLightBrush" Color="#26374B"/>
+
+    <!-- ===================== Recursos nuevos (mismos nombres que Colors.xaml) ===================== -->
+    <SolidColorBrush x:Key="HoverBackgroundBrush" Color="#1E293B"/>
+    <SolidColorBrush x:Key="PressedBackgroundBrush" Color="#263449"/>
+    <SolidColorBrush x:Key="FocusBorderBrush" Color="#3B82F6"/>
+    <SolidColorBrush x:Key="TableHeaderBackgroundBrush" Color="#111B2E"/>
+
+    <SolidColorBrush x:Key="SidebarHoverBrush" Color="#14FFFFFF"/>
+    <SolidColorBrush x:Key="SidebarActivePillBrush" Color="#332563EB"/>
+    <SolidColorBrush x:Key="SidebarIconActiveBrush" Color="White"/>
+    <SolidColorBrush x:Key="SidebarIconInactiveBrush" Color="#7C96BE"/>
+    <SolidColorBrush x:Key="SidebarTextActiveBrush" Color="White"/>
+    <SolidColorBrush x:Key="SidebarTextInactiveBrush" Color="#B7C4D9"/>
+    <SolidColorBrush x:Key="SidebarMutedTextBrush" Color="#7090B0"/>
+
+    <SolidColorBrush x:Key="HeaderMutedTextBrush" Color="#A9BEDC"/>
+    <SolidColorBrush x:Key="HeaderDividerBrush" Color="#26FFFFFF"/>
+
+</ResourceDictionary>

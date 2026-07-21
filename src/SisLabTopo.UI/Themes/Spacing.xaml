@@ -32,19 +32,29 @@
         consume. No se usan en ningún otro contexto (double puro) en el resto de la
         app, así que el cambio de tipo es seguro.
     -->
-    <GridLength x:Key="SidebarWidth">245</GridLength>
+    <!--
+        Rediseño visual: SidebarWidth 245 -> 264 para dar espacio cómodo a icono grande
+        (20px) + texto sin apretar (estilo barra lateral ancha de macOS/Finder).
+        CardRadius/CardCornerRadius 12 -> 14 (encargo explícito). ButtonCornerRadius y
+        TextBoxCornerRadius se redondean un poco más (8->10, 6->8) para el lenguaje
+        visual "Windows 11" de esquinas más suaves. Escala de espaciado base 8px
+        (GapSmall/Medium/Large ya la seguían: 8/16/24); se añade GapXLarge=32 para
+        completar la escala 8/16/24/32 pedida.
+    -->
+    <GridLength x:Key="SidebarWidth">264</GridLength>
     <GridLength x:Key="TopBarHeight">62</GridLength>
     <GridLength x:Key="StatusBarHeight">34</GridLength>
-    <sys:Double x:Key="CardRadius">12</sys:Double>
+    <sys:Double x:Key="CardRadius">14</sys:Double>
     <sys:Double x:Key="GapSmall">8</sys:Double>
     <sys:Double x:Key="GapMedium">16</sys:Double>
     <sys:Double x:Key="GapLarge">24</sys:Double>
+    <sys:Double x:Key="GapXLarge">32</sys:Double>
 
     <Thickness x:Key="CardPadding">16</Thickness>
-    <CornerRadius x:Key="CardCornerRadius">12</CornerRadius>
+    <CornerRadius x:Key="CardCornerRadius">14</CornerRadius>
     <CornerRadius x:Key="PillCornerRadius">12</CornerRadius>
-    <CornerRadius x:Key="ButtonCornerRadius">8</CornerRadius>
-    <CornerRadius x:Key="TextBoxCornerRadius">6</CornerRadius>
+    <CornerRadius x:Key="ButtonCornerRadius">10</CornerRadius>
+    <CornerRadius x:Key="TextBoxCornerRadius">8</CornerRadius>
 
     <!-- DataGrid: puerto de SwingUtils.formatearTabla() -->
     <sys:Double x:Key="DataGridRowHeight">34</sys:Double>

@@ -41,7 +41,7 @@
                            FontFamily="{StaticResource AppFontFamily}"
                            FontSize="22"
                            FontWeight="Bold"
-                           Foreground="{StaticResource TextDarkBrush}"
+                           Foreground="{DynamicResource TextDarkBrush}"
                            Margin="0,2,0,0"/>
                 <TextBlock Text="{Binding Description, RelativeSource={RelativeSource AncestorType=UserControl}}"
                            Style="{StaticResource SmallStyle}"

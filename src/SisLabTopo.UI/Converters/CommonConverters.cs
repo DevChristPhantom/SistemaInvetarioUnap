@@ -38,3 +38,19 @@ public sealed class InverseBoolToVisibilityConverter : IValueConverter
     public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
         throw new NotSupportedException();
 }
+
+/// <summary>
+/// <c>ShellViewModel.EsTemaOscuro</c> -&gt; rótulo del toggle claro/oscuro del header
+/// (rediseño visual). Se usa texto en vez de un glifo de sol/luna a propósito: el
+/// encargo pide no adivinar codepoints de Segoe Fluent/MDL2 que no se puedan verificar
+/// con certeza, y un rótulo de texto además refuerza la accesibilidad (nunca depender
+/// solo de un icono para comunicar el estado actual).
+/// </summary>
+public sealed class BoolToThemeLabelConverter : IValueConverter
+{
+    public object Convert(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        value is true ? "Oscuro" : "Claro";
+
+    public object ConvertBack(object? value, Type targetType, object? parameter, CultureInfo culture) =>
+        throw new NotSupportedException();
+}

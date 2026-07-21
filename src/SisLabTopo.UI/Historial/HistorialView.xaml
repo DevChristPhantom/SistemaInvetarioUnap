@@ -14,7 +14,7 @@
         DatePicker real de WPF (mejora explícita sobre los JTextField de texto libre sin
         validación que tenía Java).
     -->
-    <Grid Background="{StaticResource BackgroundBrush}">
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>

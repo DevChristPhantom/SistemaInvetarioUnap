@@ -18,7 +18,7 @@
         <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=CodigoBox}" Margin="0,2,0,0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{StaticResource DangerBrush}"/>
+                    <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{DynamicResource DangerBrush}"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -28,7 +28,7 @@
         <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=DenominacionBox}" Margin="0,2,0,0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
-                    <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{StaticResource DangerBrush}"/>
+                    <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{DynamicResource DangerBrush}"/>
                 </DataTemplate>
             </ItemsControl.ItemTemplate>
         </ItemsControl>
@@ -73,7 +73,7 @@
         <TextBlock Text="{Binding MensajeError}"
                    Style="{StaticResource SmallStyle}"
                    FontWeight="Bold"
-                   Foreground="{StaticResource DangerBrush}"
+                   Foreground="{DynamicResource DangerBrush}"
                    TextWrapping="Wrap"
                    Margin="0,12,0,0"
                    Visibility="{Binding MensajeError, Converter={StaticResource StringToVisibilityConverter}}"/>

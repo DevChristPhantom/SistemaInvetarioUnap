@@ -10,7 +10,23 @@
         MinWidth="1000" MinHeight="650"
         WindowStartupLocation="CenterScreen"
         WindowState="Maximized"
-        Background="{StaticResource BackgroundBrush}">
+        Background="{DynamicResource BackgroundBrush}">
+
+    <!--
+        Rediseño visual profesional:
+          - SIDEBAR estilo macOS/Fluent NavigationView: ancha (SidebarWidth, 264px),
+            icono real de cada módulo (mapeo 1:1 de MainFrame.java, ver comentario junto
+            a la navegación más abajo) + texto, indicador azul + "pill" translúcido
+            cuando el módulo está activo, hover animado.
+          - HEADER estilo Microsoft 365: nombre del sistema + subtítulo, reloj en vivo
+            (ShellViewModel.FechaHoraTexto, DispatcherTimer de 1s), toggle claro/oscuro,
+            campana de notificaciones (decorativa por ahora, ver ToolTip), engranaje de
+            configuración, y bloque de usuario/avatar con un menú desplegable que
+            reemplaza al antiguo botón grande rojo "Cerrar sesión".
+          - Todo color viene de {DynamicResource ...} (no StaticResource): así el
+            intercambio de tema en caliente (Theming/ThemeService) repinta esta ventana
+            sin recrearla — ver el comentario XML de ThemeService para el porqué.
+    -->
 
     <Window.Resources>
         <converters:ViewModelIsTypeConverter x:Key="ViewModelIsTypeConverter"/>
@@ -23,10 +39,10 @@
         </Grid.ColumnDefinitions>
 
         <!-- ===================== SIDEBAR (West, alto completo) ===================== -->
-        <Border Grid.Column="0" Background="{StaticResource SidebarBackgroundBrush}">
-            <DockPanel Margin="12,20,12,16">
+        <Border Grid.Column="0" Background="{DynamicResource SidebarBackgroundBrush}">
+            <DockPanel Margin="16,20,16,16">
 
-                <!-- Logos institucionales -->
+                <!-- Logos institucionales (identidad: no se tocan nombres/escudos) -->
                 <Border DockPanel.Dock="Top"
                         Background="#061427"
                         CornerRadius="{StaticResource CardCornerRadius}"
@@ -39,25 +55,25 @@
                             <ColumnDefinition Width="*"/>
                         </Grid.ColumnDefinitions>
                         <StackPanel Grid.Column="0" HorizontalAlignment="Center">
-                            <Image Source="/Assets/Logo_UNAP.png" Width="42" Height="42"/>
+                            <Image Source="pack://application:,,,/SisLabTopo.UI;component/Assets/Logo_UNAP.png" Width="42" Height="42"/>
                             <TextBlock Text="UNIVERSIDAD NACIONAL DEL ALTIPLANO"
                                        FontFamily="{StaticResource AppFontFamily}"
                                        FontSize="8" Foreground="White"
                                        TextWrapping="Wrap" TextAlignment="Center" Margin="2,4,2,0"/>
                             <TextBlock Text="PUNO"
                                        FontFamily="{StaticResource AppFontFamily}"
-                                       FontSize="8" Foreground="#7090b0"
+                                       FontSize="8" Foreground="{DynamicResource SidebarMutedTextBrush}"
                                        TextAlignment="Center"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" HorizontalAlignment="Center">
-                            <Image Source="/Assets/Logo_Minas.png" Width="42" Height="42"/>
+                            <Image Source="pack://application:,,,/SisLabTopo.UI;component/Assets/Logo_Minas.png" Width="42" Height="42"/>
                             <TextBlock Text="INGENIERÍA DE MINAS UNA - PUNO"
                                        FontFamily="{StaticResource AppFontFamily}"
                                        FontSize="8" Foreground="White"
                                        TextWrapping="Wrap" TextAlignment="Center" Margin="2,4,2,0"/>
                             <TextBlock Text="FIM"
                                        FontFamily="{StaticResource AppFontFamily}"
-                                       FontSize="8" Foreground="#7090b0"
+                                       FontSize="8" Foreground="{DynamicResource SidebarMutedTextBrush}"
                                        TextAlignment="Center"/>
                         </StackPanel>
                     </Grid>
@@ -65,31 +81,95 @@
 
                 <!-- Pie de página del sidebar -->
                 <StackPanel DockPanel.Dock="Bottom">
-                    <StackPanel Orientation="Horizontal" Margin="4,0,0,0">
+                    <StackPanel Orientation="Horizontal" Margin="10,0,0,0">
                         <TextBlock Text="Sistema Administrativo"
                                    FontFamily="{StaticResource AppFontFamily}"
-                                   FontSize="11" FontWeight="Bold"
-                                   Foreground="#A0B0C0"/>
+                                   FontSize="11" FontWeight="SemiBold"
+                                   Foreground="{DynamicResource SidebarTextInactiveBrush}"/>
                     </StackPanel>
                     <TextBlock Text="Versión 1.0 | UNA Puno"
                                FontFamily="{StaticResource AppFontFamily}"
                                FontSize="10"
-                               Foreground="#708095"
-                               Margin="4,4,0,0"/>
+                               Foreground="{DynamicResource SidebarMutedTextBrush}"
+                               Margin="10,4,0,0"/>
                 </StackPanel>
 
-                <!-- Navegación -->
+                <!--
+                    Navegación: mapeo 1:1 de iconos heredados de la app Java
+                    (ui/MainFrame.java líneas 299-305 — SwingUtils.cargarIconoTintado
+                    los teñía de blanco a 18x18 para el sidebar oscuro):
+                      Dashboard          -> tablero.png
+                      Equipos            -> nivel-laser.png
+                      Préstamos Activos  -> pagar.png
+                      Historial          -> archivo.png
+                      Configuración      -> config.png
+                    Aquí el "teñido" (blanco activo/hover, azul-grisáceo inactivo) se
+                    logra con el propio PNG como OpacityMask de un Rectangle cuyo Fill
+                    lo controla SidebarIconStyle (Themes/Controls.xaml) según el Tag del
+                    Button padre — el color de cada estado vive en el tema, no en el
+                    archivo de imagen.
+                -->
                 <StackPanel Margin="0,25,0,0">
-                    <Button Content="Dashboard" Command="{Binding NavegarDashboardCommand}" Style="{StaticResource SidebarNavButtonStyle}"
-                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=DashboardViewModel}"/>
-                    <Button Content="Equipos" Command="{Binding NavegarEquiposCommand}" Style="{StaticResource SidebarNavButtonStyle}"
-                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=EquiposViewModel}"/>
-                    <Button Content="Préstamos Activos" Command="{Binding NavegarPrestamosCommand}" Style="{StaticResource SidebarNavButtonStyle}"
-                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=PrestamosViewModel}"/>
-                    <Button Content="Historial" Command="{Binding NavegarHistorialCommand}" Style="{StaticResource SidebarNavButtonStyle}"
-                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=HistorialViewModel}"/>
-                    <Button Content="Configuración" Command="{Binding NavegarConfiguracionCommand}" Style="{StaticResource SidebarNavButtonStyle}"
-                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=ConfiguracionViewModel}"/>
+                    <Button Command="{Binding NavegarDashboardCommand}" Style="{StaticResource SidebarNavButtonStyle}"
+                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=DashboardViewModel}"
+                            ToolTip="Dashboard">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Style="{StaticResource SidebarIconStyle}">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/tablero.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Dashboard" Style="{StaticResource SidebarLabelStyle}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavegarEquiposCommand}" Style="{StaticResource SidebarNavButtonStyle}"
+                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=EquiposViewModel}"
+                            ToolTip="Equipos">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Style="{StaticResource SidebarIconStyle}">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/nivel-laser.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Equipos" Style="{StaticResource SidebarLabelStyle}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavegarPrestamosCommand}" Style="{StaticResource SidebarNavButtonStyle}"
+                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=PrestamosViewModel}"
+                            ToolTip="Préstamos Activos">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Style="{StaticResource SidebarIconStyle}">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/pagar.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Préstamos Activos" Style="{StaticResource SidebarLabelStyle}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavegarHistorialCommand}" Style="{StaticResource SidebarNavButtonStyle}"
+                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=HistorialViewModel}"
+                            ToolTip="Historial">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Style="{StaticResource SidebarIconStyle}">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/archivo.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Historial" Style="{StaticResource SidebarLabelStyle}"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding NavegarConfiguracionCommand}" Style="{StaticResource SidebarNavButtonStyle}"
+                            Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=ConfiguracionViewModel}"
+                            ToolTip="Configuración">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Style="{StaticResource SidebarIconStyle}">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/config.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Configuración" Style="{StaticResource SidebarLabelStyle}"/>
+                        </StackPanel>
+                    </Button>
                 </StackPanel>
             </DockPanel>
         </Border>
@@ -102,27 +182,106 @@
                 <RowDefinition Height="{StaticResource StatusBarHeight}"/>
             </Grid.RowDefinitions>
 
-            <!-- TopBar -->
-            <Border Grid.Row="0" Background="{StaticResource SidebarBackgroundBrush}" Padding="20,0">
+            <!-- ===================== HEADER (estilo Microsoft 365) ===================== -->
+            <Border Grid.Row="0" Background="{DynamicResource SidebarBackgroundBrush}" Padding="24,0">
                 <Grid>
-                    <TextBlock Text="SisLab-Topo — Laboratorio de Topografía Minera"
-                               Style="{StaticResource SubtitleStyle}"
-                               FontSize="15"
-                               Foreground="White"
-                               VerticalAlignment="Center"
-                               HorizontalAlignment="Left"/>
+                    <!-- Nombre del sistema + subtítulo -->
+                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Left">
+                        <TextBlock Text="SisLab-Topo"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontSize="16" FontWeight="Bold"
+                                   Foreground="White"/>
+                        <TextBlock Text="Laboratorio de Topografía Minera · Sistema Administrativo"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontSize="10.5"
+                                   Foreground="{DynamicResource HeaderMutedTextBrush}"/>
+                    </StackPanel>
 
+                    <!-- Reloj + acciones + usuario -->
                     <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
-                        <TextBlock Text="Docente: Administrador"
-                                   Style="{StaticResource BodyStyle}"
-                                   FontWeight="Bold"
-                                   Foreground="White"
+
+                        <TextBlock Text="{Binding FechaHoraTexto}"
+                                   FontFamily="{StaticResource AppFontFamily}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource HeaderMutedTextBrush}"
                                    VerticalAlignment="Center"
-                                   Margin="0,0,15,0"/>
-                        <Button Content="Cerrar sesión"
-                                Command="{Binding CerrarSesionCommand}"
-                                Style="{StaticResource DangerButtonStyle}"
-                                Width="135" Height="34"/>
+                                   Margin="0,0,16,0"/>
+
+                        <Border Width="1" Height="22" Background="{DynamicResource HeaderDividerBrush}" Margin="0,0,12,0"/>
+
+                        <!--
+                            Toggle claro/oscuro (Fase de rediseño): decisión de diseño —
+                            vive en el header (no en Configuración) para que cambiar de
+                            tema sea una acción de un clic desde cualquier pantalla,
+                            priorizando "que funcione y se vea bien" sobre la ubicación
+                            "perfecta". Ver Theming/IThemeService.
+                        -->
+                        <ToggleButton Style="{StaticResource ThemeToggleButtonStyle}"
+                                      IsChecked="{Binding EsTemaOscuro, Mode=OneWay}"
+                                      Command="{Binding AlternarTemaCommand}"
+                                      Content="{Binding EsTemaOscuro, Converter={StaticResource BoolToThemeLabelConverter}}"
+                                      ToolTip="Cambiar entre modo claro y oscuro"
+                                      Margin="0,0,8,0"/>
+
+                        <!--
+                            Notificaciones: decorativa por ahora — no hay ningún origen
+                            de notificaciones real todavía en Services/Domain (fuera del
+                            alcance de esta fase de solo-diseño). Se deja visible,
+                            enfocable y con ToolTip (accesibilidad: nunca deshabilitar
+                            por completo un control que aún no tiene función, para no
+                            ocultarlo de la navegación por teclado sin explicación) pero
+                            atenuada y sin Command, para que sea evidente que todavía no
+                            hace nada.
+                        -->
+                        <Button Style="{StaticResource HeaderIconButtonStyle}"
+                                ToolTip="Notificaciones (sin notificaciones nuevas todavía)"
+                                Opacity="0.65"
+                                Margin="0,0,4,0">
+                            <TextBlock Text="&#xE7E7;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="15"/>
+                        </Button>
+
+                        <Button Style="{StaticResource HeaderIconButtonStyle}"
+                                Command="{Binding NavegarConfiguracionCommand}"
+                                ToolTip="Configuración"
+                                Margin="0,0,10,0">
+                            <TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="15"/>
+                        </Button>
+
+                        <Border Width="1" Height="22" Background="{DynamicResource HeaderDividerBrush}" Margin="0,0,10,0"/>
+
+                        <!--
+                            Bloque de usuario/avatar: reemplaza al antiguo botón grande
+                            rojo "Cerrar sesión". Clic -> abre un ContextMenu anclado
+                            (ShellView.xaml.cs, AvatarButton_Click) con "Cerrar sesión"
+                            adentro — el binding del MenuItem usa PlacementTarget
+                            porque un ContextMenu no hereda el DataContext visual normal.
+                        -->
+                        <Button Style="{StaticResource HeaderUserButtonStyle}" Click="AvatarButton_Click">
+                            <Button.ContextMenu>
+                                <ContextMenu>
+                                    <MenuItem Header="Cerrar sesión"
+                                              Command="{Binding PlacementTarget.DataContext.CerrarSesionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                </ContextMenu>
+                            </Button.ContextMenu>
+                            <StackPanel Orientation="Horizontal">
+                                <Border Width="30" Height="30" CornerRadius="15" Background="{DynamicResource AccentBrush}">
+                                    <TextBlock Text="{Binding InicialesUsuario}"
+                                               FontFamily="{StaticResource AppFontFamily}"
+                                               FontSize="12" FontWeight="Bold"
+                                               Foreground="White"
+                                               HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                                </Border>
+                                <TextBlock Text="{Binding NombreUsuario}"
+                                           FontFamily="{StaticResource AppFontFamily}"
+                                           FontSize="12.5" FontWeight="SemiBold"
+                                           Foreground="White"
+                                           VerticalAlignment="Center"
+                                           Margin="8,0,4,0"/>
+                                <TextBlock Text="&#xE70D;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="9"
+                                           Foreground="{DynamicResource HeaderMutedTextBrush}"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
                     </StackPanel>
                 </Grid>
             </Border>
@@ -133,13 +292,12 @@
                              Margin="{StaticResource CardPadding}"/>
 
             <!-- StatusBar -->
-            <Border Grid.Row="2" Background="White" BorderBrush="{StaticResource BorderLightBrush}" BorderThickness="0,1,0,0">
+            <Border Grid.Row="2" Background="{DynamicResource CardBrush}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="0,1,0,0">
                 <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,15,0">
-                    <Ellipse Width="8" Height="8" Fill="{StaticResource SuccessBrush}" Margin="0,0,8,0"/>
+                    <Ellipse Width="8" Height="8" Fill="{DynamicResource SuccessBrush}" Margin="0,0,8,0"/>
                     <TextBlock Text="{Binding EstadoEquiposTexto}"
                                Style="{StaticResource SmallStyle}"
-                               FontWeight="Bold"
-                               Foreground="#1B5E20"/>
+                               FontWeight="SemiBold"/>
                 </StackPanel>
             </Border>
         </Grid>

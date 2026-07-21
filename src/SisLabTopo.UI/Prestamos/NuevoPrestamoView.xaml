@@ -40,7 +40,7 @@
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=DocenteBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{StaticResource DangerBrush}"/>
+                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{DynamicResource DangerBrush}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -55,7 +55,7 @@
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=CursoBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{StaticResource DangerBrush}"/>
+                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{DynamicResource DangerBrush}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -70,7 +70,7 @@
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=EstudianteBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{StaticResource DangerBrush}"/>
+                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{DynamicResource DangerBrush}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -82,7 +82,7 @@
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=CodigoEstudianteBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
-                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{StaticResource DangerBrush}"/>
+                                <TextBlock Text="{Binding ErrorContent}" Style="{StaticResource SmallStyle}" Foreground="{DynamicResource DangerBrush}"/>
                             </DataTemplate>
                         </ItemsControl.ItemTemplate>
                     </ItemsControl>
@@ -153,7 +153,7 @@
             <TextBlock Text="{Binding MensajeError}"
                        Style="{StaticResource SmallStyle}"
                        FontWeight="Bold"
-                       Foreground="{StaticResource DangerBrush}"
+                       Foreground="{DynamicResource DangerBrush}"
                        TextWrapping="Wrap"
                        Margin="0,8,0,0"
                        Visibility="{Binding MensajeError, Converter={StaticResource StringToVisibilityConverter}}"/>

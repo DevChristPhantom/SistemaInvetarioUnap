@@ -14,7 +14,7 @@
         IsBusy (deshabilita filtros/botones mientras carga, importa o exporta: Java
         bloqueaba la UI entera durante estas operaciones).
     -->
-    <Grid Background="{StaticResource BackgroundBrush}">
+    <Grid Background="{DynamicResource BackgroundBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>

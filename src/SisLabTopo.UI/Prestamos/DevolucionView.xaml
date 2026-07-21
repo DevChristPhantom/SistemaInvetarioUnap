@@ -21,7 +21,7 @@
         <TextBlock Text="{Binding MensajeError}"
                    Style="{StaticResource SmallStyle}"
                    FontWeight="Bold"
-                   Foreground="{StaticResource DangerBrush}"
+                   Foreground="{DynamicResource DangerBrush}"
                    TextWrapping="Wrap"
                    Margin="0,10,0,0"
                    Visibility="{Binding MensajeError, Converter={StaticResource StringToVisibilityConverter}}"/>
