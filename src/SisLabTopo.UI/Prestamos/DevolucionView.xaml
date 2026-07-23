@@ -28,7 +28,12 @@
 
         <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,18,0,0">
             <Button Content="Cancelar" Command="{Binding CancelarCommand}" Style="{StaticResource SecondaryButtonStyle}" Width="100" Margin="0,0,10,0"/>
-            <Button Content="Registrar Devolución" Command="{Binding RegistrarCommand}" Style="{StaticResource SuccessButtonStyle}" Width="170"/>
+            <Button Command="{Binding RegistrarCommand}" Style="{StaticResource SuccessButtonStyle}" Width="180">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Text="&#xE7A7;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                    <TextBlock Text="Registrar Devolución" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </StackPanel>
 </Window>

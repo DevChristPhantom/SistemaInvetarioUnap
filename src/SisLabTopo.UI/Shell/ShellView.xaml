@@ -6,6 +6,7 @@
         xmlns:converters="clr-namespace:SisLabTopo.UI.Converters"
         mc:Ignorable="d"
         Title="SisLab-Topo — Laboratorio de Topografía Minera"
+        Icon="pack://application:,,,/SisLabTopo.UI;component/Assets/app_icon.ico"
         Width="1150" Height="720"
         MinWidth="1000" MinHeight="650"
         WindowStartupLocation="CenterScreen"
@@ -98,7 +99,10 @@
                     Navegación: mapeo 1:1 de iconos heredados de la app Java
                     (ui/MainFrame.java líneas 299-305 — SwingUtils.cargarIconoTintado
                     los teñía de blanco a 18x18 para el sidebar oscuro):
-                      Dashboard          -> tablero.png
+                      Dashboard          -> hogar.png (antes tablero.png: un engranaje
+                                                        ahí se confundía con el propio
+                                                        engranaje de Configuración, ver
+                                                        Fase de estilización de íconos)
                       Equipos            -> nivel-laser.png
                       Préstamos Activos  -> pagar.png
                       Historial          -> archivo.png
@@ -116,7 +120,7 @@
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Style="{StaticResource SidebarIconStyle}">
                                 <Rectangle.OpacityMask>
-                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/tablero.png" Stretch="Uniform"/>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/hogar.png" Stretch="Uniform"/>
                                 </Rectangle.OpacityMask>
                             </Rectangle>
                             <TextBlock Text="Dashboard" Style="{StaticResource SidebarLabelStyle}"/>
@@ -260,7 +264,11 @@
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Cerrar sesión"
-                                              Command="{Binding PlacementTarget.DataContext.CerrarSesionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}"/>
+                                              Command="{Binding PlacementTarget.DataContext.CerrarSesionCommand, RelativeSource={RelativeSource AncestorType=ContextMenu}}">
+                                        <MenuItem.Icon>
+                                            <Image Source="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/logout.png" Width="15" Height="15"/>
+                                        </MenuItem.Icon>
+                                    </MenuItem>
                                 </ContextMenu>
                             </Button.ContextMenu>
                             <StackPanel Orientation="Horizontal">

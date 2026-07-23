@@ -24,11 +24,23 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\app_icon.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
     <Resource Include="Assets\Logo_UNAP.png" />
     <Resource Include="Assets\Logo_Minas.png" />
+
+    <!--
+      Ícono de aplicación (barra de tareas, Alt+Tab, .exe, acceso directo del
+      instalador): recorte simplificado del escudo institucional (Assets\Logo_UNAP.png,
+      ver generación en el historial de esta fase): se retira el penacho de plumas
+      lateral porque no se distingue en tamaños de 16/32px, dejando solo el cuerpo del
+      escudo (franja roja + trigo/llama/pez + cinta "PUNO"). ApplicationIcon (arriba)
+      lo embebe en el .exe; el Resource de aquí abajo permite además referenciarlo por
+      pack URI desde Window.Icon en LoginView/ShellView.
+    -->
+    <Resource Include="Assets\app_icon.ico" />
 
     <!--
       Rediseño visual (Fase de diseño UI): iconos heredados 1:1 de la app Java
@@ -38,7 +50,6 @@
       directamente desde XAML/tema, igual que hacía SwingUtils.cargarIconoTintado en
       Java pero sin fabricar un asset nuevo.
     -->
-    <Resource Include="Assets\Icons\tablero.png" />
     <Resource Include="Assets\Icons\nivel-laser.png" />
     <Resource Include="Assets\Icons\pagar.png" />
     <Resource Include="Assets\Icons\archivo.png" />
@@ -50,6 +61,33 @@
       copiado tal cual y usado como OpacityMask (blanco) sobre botones de "Editar".
     -->
     <Resource Include="Assets\Icons\boton-editar.png" />
+
+    <!--
+      Fase de estilización de íconos: set de Google Material Symbols (24dp,
+      relleno #1F1F1F, fondo transparente) provisto por el usuario en
+      scratch\sislab-topo-net\Iconos junto con "hogar.png" (heredado de Java,
+      sin uso hasta ahora) y el ícono de cierre de sesión (recortado del set de
+      Java, "esquema-del-boton..." renombrado aquí a logout.png). Mismo
+      criterio de teñido por Rectangle+OpacityMask que el resto: el color real
+      (blanco sobre los botones de acción, para que resalten sobre el fondo de
+      color sólido) lo pone el XAML consumidor, no el PNG.
+        hogar.png                    -> Dashboard (sidebar, reemplaza a tablero.png:
+                                         un engranaje ahí se confundía con el
+                                         engranaje de Configuración)
+        precision_manufacturing.png  -> Registrar Nuevo Equipo
+        front_loader.png             -> Importar (Excel): "cargar" datos
+        print_add.png                -> Guardar e Imprimir
+        print_connect.png            -> Imprimir
+        drag_click.png               -> Ver Detalle
+        logout.png                   -> ítem "Cerrar sesión" del menú de usuario
+    -->
+    <Resource Include="Assets\Icons\hogar.png" />
+    <Resource Include="Assets\Icons\precision_manufacturing.png" />
+    <Resource Include="Assets\Icons\front_loader.png" />
+    <Resource Include="Assets\Icons\print_add.png" />
+    <Resource Include="Assets\Icons\print_connect.png" />
+    <Resource Include="Assets\Icons\drag_click.png" />
+    <Resource Include="Assets\Icons\logout.png" />
   </ItemGroup>
 
 </Project>

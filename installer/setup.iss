@@ -41,10 +41,7 @@ OutputBaseFilename=SisLab-Topo-Setup-{#MyAppVersion}
 OutputDir=..\dist
 Compression=lzma2/ultra64
 SolidCompression=yes
-; No existe un .ico propio en el proyecto (tampoco existía en la versión Java,
-; que dejaba esta misma línea comentada). Si se agrega un ícono de app más
-; adelante, descomentar y apuntar aquí:
-; SetupIconFile=..\src\SisLabTopo.UI\Assets\app_icon.ico
+SetupIconFile=..\src\SisLabTopo.UI\Assets\app_icon.ico
 WizardStyle=modern
 LicenseFile=..\LICENSE.txt
 ArchitecturesAllowed=x64compatible

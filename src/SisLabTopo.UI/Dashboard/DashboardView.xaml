@@ -245,17 +245,69 @@
                             <RowDefinition Height="*"/>
                         </Grid.RowDefinitions>
                         <TextBlock Grid.Row="0" Text="Acciones Rápidas" Style="{StaticResource SubtitleStyle}" Margin="0,0,0,10"/>
+                        <!--
+                            Fase de estilización de íconos: cada acción rápida gana un
+                            ícono a la izquierda del texto (antes solo texto sobre la
+                            barra de color, ver historial de esta fase). Mismo criterio
+                            de Rectangle+OpacityMask que EquiposView/ShellView: Fill
+                            blanco fijo (no DynamicResource) porque el fondo de estos
+                            botones ya es un color sólido de marca (verde/azul/navy) que
+                            no cambia entre tema claro/oscuro, así que blanco siempre da
+                            el contraste más alto posible.
+                        -->
                         <StackPanel Grid.Row="1" VerticalAlignment="Top">
-                            <Button Content="Nuevo Préstamo de Equipos" Command="{Binding NuevoPrestamoCommand}"
-                                    Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="0,0,0,8"/>
-                            <Button Content="Registrar Devolución Rápida" Command="{Binding RegistrarDevolucionRapidaCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8"/>
-                            <Button Content="Registrar Nuevo Equipo" Command="{Binding RegistrarNuevoEquipoCommand}"
-                                    Style="{StaticResource PrimaryButtonStyle}" Height="38" Margin="0,0,0,8"/>
-                            <Button Content="Importar Equipos (Excel)" Command="{Binding ImportarEquiposExcelCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8"/>
-                            <Button Content="Exportar Inventario (Excel)" Command="{Binding ExportarInventarioExcelCommand}"
-                                    Style="{StaticResource SecondaryButtonStyle}" Height="38"/>
+                            <Button Command="{Binding NuevoPrestamoCommand}"
+                                    Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/pagar.png" Stretch="Uniform"/>
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    <TextBlock Text="Nuevo Préstamo de Equipos" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding RegistrarDevolucionRapidaCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <!-- Sin PNG heredado equivalente a "devolver": glifo estándar de Windows (Segoe MDL2 Assets, E7A7 "Undo"), mismo criterio que el "+"/papelera de EquiposView. -->
+                                    <TextBlock Text="&#xE7A7;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                    <TextBlock Text="Registrar Devolución Rápida" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding RegistrarNuevoEquipoCommand}"
+                                    Style="{StaticResource PrimaryButtonStyle}" Height="38" Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/precision_manufacturing.png" Stretch="Uniform"/>
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    <TextBlock Text="Registrar Nuevo Equipo" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding ImportarEquiposExcelCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/front_loader.png" Stretch="Uniform"/>
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    <TextBlock Text="Importar Equipos (Excel)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
+                            <Button Command="{Binding ExportarInventarioExcelCommand}"
+                                    Style="{StaticResource SecondaryButtonStyle}" Height="38">
+                                <StackPanel Orientation="Horizontal">
+                                    <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                                        <Rectangle.OpacityMask>
+                                            <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/archivo.png" Stretch="Uniform"/>
+                                        </Rectangle.OpacityMask>
+                                    </Rectangle>
+                                    <TextBlock Text="Exportar Inventario (Excel)" VerticalAlignment="Center"/>
+                                </StackPanel>
+                            </Button>
                         </StackPanel>
                     </Grid>
                 </controls:RoundedCard>

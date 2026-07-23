@@ -7,6 +7,7 @@
         mc:Ignorable="d"
         d:DataContext="{d:DesignInstance Type=startup:FirstRunSetupViewModel}"
         Title="SisLab-Topo — Configuración Inicial"
+        Icon="pack://application:,,,/SisLabTopo.UI;component/Assets/app_icon.ico"
         Width="1000" Height="660"
         MinWidth="780" MinHeight="560"
         WindowStartupLocation="CenterScreen"

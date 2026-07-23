@@ -163,7 +163,16 @@
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
             <Button Content="Cancelar" Command="{Binding CancelarCommand}" Style="{StaticResource SecondaryButtonStyle}" Width="100" Margin="0,0,10,0"/>
             <Button Content="Guardar" Command="{Binding GuardarCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="100" Margin="0,0,10,0"/>
-            <Button Content="Guardar e Imprimir" Command="{Binding GuardarEImprimirCommand}" Style="{StaticResource SuccessButtonStyle}" Width="150"/>
+            <Button Command="{Binding GuardarEImprimirCommand}" Style="{StaticResource SuccessButtonStyle}" Width="170">
+                <StackPanel Orientation="Horizontal">
+                    <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/print_add.png" Stretch="Uniform"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                    <TextBlock Text="Guardar e Imprimir" VerticalAlignment="Center"/>
+                </StackPanel>
+            </Button>
         </StackPanel>
     </Grid>
 </Window>

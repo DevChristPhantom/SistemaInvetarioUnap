@@ -5,6 +5,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         mc:Ignorable="d"
         Title="SisLab-Topo — Acceso al Sistema"
+        Icon="pack://application:,,,/SisLabTopo.UI;component/Assets/app_icon.ico"
         Width="1000" Height="620"
         MinWidth="760" MinHeight="520"
         WindowStartupLocation="CenterScreen"

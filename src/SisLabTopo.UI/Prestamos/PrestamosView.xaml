@@ -60,8 +60,23 @@
                             <TextBlock Text="Nuevo Préstamo" VerticalAlignment="Center"/>
                         </StackPanel>
                     </Button>
-                    <Button Content="Ver Detalle" Command="{Binding VerDetalleCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
-                    <Button Content="Registrar Devolución" Command="{Binding RegistrarDevolucionCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0"/>
+                    <Button Command="{Binding VerDetalleCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
+                                <Rectangle.OpacityMask>
+                                    <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/drag_click.png" Stretch="Uniform"/>
+                                </Rectangle.OpacityMask>
+                            </Rectangle>
+                            <TextBlock Text="Ver Detalle" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
+                    <Button Command="{Binding RegistrarDevolucionCommand}" Style="{StaticResource SecondaryButtonStyle}" Margin="0,0,8,0">
+                        <StackPanel Orientation="Horizontal">
+                            <!-- Sin PNG heredado equivalente a "devolver": glifo estándar de Windows (Segoe MDL2 Assets, E7A7 "Undo"), mismo criterio que el resto de glifos de esta fase. -->
+                            <TextBlock Text="&#xE7A7;" FontFamily="Segoe MDL2 Assets" FontSize="14" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                            <TextBlock Text="Registrar Devolución" VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Button>
                     <Button Command="{Binding ImprimirCommand}" Style="{StaticResource PrimaryButtonStyle}">
                         <StackPanel Orientation="Horizontal">
                             <!-- Impresora (Segoe MDL2 Assets, codepoint E749 "Print"). -->
