@@ -29,3 +29,4 @@ if ($LASTEXITCODE -ne 0) {
 
 Write-Host "Publish listo: $outDir\SisLabTopo.UI.exe"
 Write-Host "Ahora puedes compilar el instalador con: ISCC.exe installer\setup.iss"
+Write-Host "(Opcional) Firmar el .exe antes de empaquetar: ver installer\sign.ps1"

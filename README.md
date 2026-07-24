@@ -152,6 +152,20 @@ ISCC.exe installer\setup.iss
 
 Produce un instalador único y autocontenido (`dist\SisLab-Topo-Setup-x.y.z.exe`, runtime .NET incluido, no requiere instalar nada por separado) mediante [Inno Setup](https://jrsoftware.org/isinfo.php).
 
+#### Firma digital (Authenticode)
+
+El instalador **no está firmado digitalmente todavía**, así que Windows SmartScreen muestra la advertencia estándar de "Editor desconocido" al ejecutarlo (documentado también en el manual de instalación). `installer\sign.ps1` deja el flujo de firma listo y probado:
+
+```powershell
+# Prueba local del pipeline (certificado autofirmado de un solo uso -- NO quita SmartScreen)
+powershell -ExecutionPolicy Bypass -File installer\sign.ps1 -FilePath dist\SisLab-Topo-Setup-1.0.0.exe -CreateSelfSignedDevCert
+
+# Firma real, una vez que la institución tenga un certificado Authenticode
+powershell -ExecutionPolicy Bypass -File installer\sign.ps1 -FilePath dist\SisLab-Topo-Setup-1.0.0.exe -CertPath C:\ruta\certificado.pfx
+```
+
+Quitar la advertencia de SmartScreen de verdad requiere que la UNAP compre un certificado Authenticode (OV/EV, ~100-400 USD/año en una CA como DigiCert/Sectigo) o se suscriba a Azure Trusted Signing (~10 USD/mes) — ninguna alternativa gratuita existe, y ambas exigen verificar la identidad de la institución ante el emisor. No es algo que se resuelva con código; el script ya deja todo lo demás (firma + timestamp RFC3161) listo para ese momento.
+
 ## Licencia
 
 Uso institucional, Facultad de Ingeniería de Minas — Universidad Nacional del Altiplano. Ver [LICENSE.txt](LICENSE.txt).
