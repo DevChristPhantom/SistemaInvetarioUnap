@@ -34,7 +34,13 @@
                            HorizontalAlignment="Left"
                            Margin="0,0,0,20"/>
 
-                <Ellipse Width="90" Height="90" Fill="{DynamicResource PrimaryBrush}" HorizontalAlignment="Center"/>
+                <Border Width="90" Height="90" CornerRadius="45" Background="{DynamicResource PrimaryBrush}" HorizontalAlignment="Center">
+                    <Rectangle Width="42" Height="42" Fill="White">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/user.png" Stretch="Uniform"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
+                </Border>
 
                 <TextBlock Text="Bienvenido"
                            FontFamily="{StaticResource AppFontFamily}"

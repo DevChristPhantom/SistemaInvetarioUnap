@@ -34,8 +34,15 @@ public partial class StatCard : UserControl
     public static readonly DependencyProperty IconBrushProperty =
         DependencyProperty.Register(nameof(IconBrush), typeof(Brush), typeof(StatCard), new PropertyMetadata(Brushes.SteelBlue));
 
-    public static readonly DependencyProperty IconGlyphProperty =
-        DependencyProperty.Register(nameof(IconGlyph), typeof(string), typeof(StatCard), new PropertyMetadata(string.Empty));
+    /// <summary>
+    /// Pack URI completa (p.ej. "pack://application:,,,/SisLabTopo.UI;component/Assets/Icons/nivel-laser.png")
+    /// del ícono mostrado en el badge circular. Reemplaza al glifo de texto de 2 letras
+    /// (EQ/OK/PR/DV) que traía la Fase 5: mismo criterio de Rectangle+OpacityMask blanco
+    /// que ya usa el resto de la app (sidebar, botones), para que el ícono se distinga
+    /// con claridad sobre el fondo de color del badge.
+    /// </summary>
+    public static readonly DependencyProperty IconSourceProperty =
+        DependencyProperty.Register(nameof(IconSource), typeof(string), typeof(StatCard), new PropertyMetadata(string.Empty));
 
     private static readonly DependencyPropertyKey DescriptionVisibilityPropertyKey =
         DependencyProperty.RegisterReadOnly(nameof(DescriptionVisibility), typeof(Visibility), typeof(StatCard),
@@ -118,11 +125,11 @@ public partial class StatCard : UserControl
         set => SetValue(IconBrushProperty, value);
     }
 
-    /// <summary>Glifo/texto corto mostrado dentro del badge circular (p.ej. un carácter Segoe MDL2/emoji-free).</summary>
-    public string IconGlyph
+    /// <summary>Nombre de archivo del ícono (Assets/Icons) mostrado dentro del badge circular.</summary>
+    public string IconSource
     {
-        get => (string)GetValue(IconGlyphProperty);
-        set => SetValue(IconGlyphProperty, value);
+        get => (string)GetValue(IconSourceProperty);
+        set => SetValue(IconSourceProperty, value);
     }
 
     public Visibility DescriptionVisibility => (Visibility)GetValue(DescriptionVisibilityProperty);

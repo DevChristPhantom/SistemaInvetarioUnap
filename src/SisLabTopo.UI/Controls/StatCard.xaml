@@ -95,12 +95,11 @@
                         Background="{Binding IconBrush, RelativeSource={RelativeSource AncestorType=UserControl}}"
                         VerticalAlignment="Center"
                         Margin="0,0,14,0">
-                    <TextBlock Text="{Binding IconGlyph, RelativeSource={RelativeSource AncestorType=UserControl}}"
-                               Foreground="White"
-                               FontSize="18"
-                               FontWeight="Bold"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"/>
+                    <Rectangle Width="22" Height="22" Fill="White">
+                        <Rectangle.OpacityMask>
+                            <ImageBrush ImageSource="{Binding IconSource, RelativeSource={RelativeSource AncestorType=UserControl}}" Stretch="Uniform"/>
+                        </Rectangle.OpacityMask>
+                    </Rectangle>
                 </Border>
 
                 <StackPanel Grid.Column="1" VerticalAlignment="Center">

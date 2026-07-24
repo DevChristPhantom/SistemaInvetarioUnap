@@ -88,6 +88,25 @@
     <Resource Include="Assets\Icons\print_connect.png" />
     <Resource Include="Assets\Icons\drag_click.png" />
     <Resource Include="Assets\Icons\logout.png" />
+
+    <!--
+      Fase de estilización de íconos (parte 2): avatar del login (antes un círculo de
+      color liso) y badges del dashboard (antes 2 letras de texto EQ/OK/PR/DV, ver
+      StatCard.IconSource) piden íconos que no existen como PNG en Iconos/. En vez de
+      adivinar codepoints de Segoe MDL2 Assets sin poder verlos (criterio ya establecido
+      en el proyecto), se rasterizó el glifo real de la fuente instalada en Windows a
+      PNG (mismo estilo 1F1F1F/transparente que el resto del set) y se revisó
+      visualmente antes de usarlo:
+        user.png       (glifo "Contact", E77B)    -> avatar circular del login
+        checkmark.png  (glifo "CheckMark", E73E)  -> StatCard "Equipos Disponibles"
+        undo.png       (glifo "Undo", E7A7)       -> StatCard "Devoluciones Hoy" y
+                                                      los botones "Registrar Devolución"
+                                                      (reemplaza al glifo de fuente que
+                                                      usaban directo, por consistencia)
+    -->
+    <Resource Include="Assets\Icons\user.png" />
+    <Resource Include="Assets\Icons\checkmark.png" />
+    <Resource Include="Assets\Icons\undo.png" />
   </ItemGroup>
 
 </Project>
