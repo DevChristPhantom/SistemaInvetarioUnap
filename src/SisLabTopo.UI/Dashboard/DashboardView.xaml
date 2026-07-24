@@ -256,7 +256,7 @@
                             el contraste más alto posible.
                         -->
                         <StackPanel Grid.Row="1" VerticalAlignment="Top">
-                            <Button Command="{Binding NuevoPrestamoCommand}"
+                            <Button Command="{Binding NuevoPrestamoCommand}" AutomationProperties.Name="Nuevo Préstamo de Equipos"
                                     Style="{StaticResource SuccessButtonStyle}" Height="38" Margin="0,0,0,8">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
@@ -267,7 +267,7 @@
                                     <TextBlock Text="Nuevo Préstamo de Equipos" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding RegistrarDevolucionRapidaCommand}"
+                            <Button Command="{Binding RegistrarDevolucionRapidaCommand}" AutomationProperties.Name="Registrar Devolución Rápida"
                                     Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
@@ -278,7 +278,7 @@
                                     <TextBlock Text="Registrar Devolución Rápida" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding RegistrarNuevoEquipoCommand}"
+                            <Button Command="{Binding RegistrarNuevoEquipoCommand}" AutomationProperties.Name="Registrar Nuevo Equipo"
                                     Style="{StaticResource PrimaryButtonStyle}" Height="38" Margin="0,0,0,8">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
@@ -289,7 +289,7 @@
                                     <TextBlock Text="Registrar Nuevo Equipo" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding ImportarEquiposExcelCommand}"
+                            <Button Command="{Binding ImportarEquiposExcelCommand}" AutomationProperties.Name="Importar Equipos (Excel)"
                                     Style="{StaticResource SecondaryButtonStyle}" Height="38" Margin="0,0,0,8">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
@@ -300,7 +300,7 @@
                                     <TextBlock Text="Importar Equipos (Excel)" VerticalAlignment="Center"/>
                                 </StackPanel>
                             </Button>
-                            <Button Command="{Binding ExportarInventarioExcelCommand}"
+                            <Button Command="{Binding ExportarInventarioExcelCommand}" AutomationProperties.Name="Exportar Inventario (Excel)"
                                     Style="{StaticResource SecondaryButtonStyle}" Height="38">
                                 <StackPanel Orientation="Horizontal">
                                     <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">

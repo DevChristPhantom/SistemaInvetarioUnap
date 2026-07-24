@@ -2,6 +2,7 @@ using System.Collections.ObjectModel;
 using System.IO;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using SisLabTopo.Domain.Enums;
 using SisLabTopo.Domain.Exceptions;
@@ -140,6 +141,7 @@ public partial class EquiposViewModel : ObservableObject, IShellContentViewModel
         if (formViewModel.GuardadoExitoso)
         {
             await CargarAsync();
+            WeakReferenceMessenger.Default.Send(new InventarioCambiadoMessage());
         }
     }
 
@@ -164,6 +166,7 @@ public partial class EquiposViewModel : ObservableObject, IShellContentViewModel
             await _equipoService.EliminarAsync(equipo.Codigo);
             _dialogService.ShowInfo("Equipo eliminado correctamente.");
             await CargarAsync();
+            WeakReferenceMessenger.Default.Send(new InventarioCambiadoMessage());
         }
         catch (ServiceException ex)
         {
@@ -193,6 +196,7 @@ public partial class EquiposViewModel : ObservableObject, IShellContentViewModel
             MensajeEstado = "Equipos importados correctamente.";
             _dialogService.ShowInfo(MensajeEstado);
             await CargarAsync();
+            WeakReferenceMessenger.Default.Send(new InventarioCambiadoMessage());
         }
         catch (ServiceException ex)
         {

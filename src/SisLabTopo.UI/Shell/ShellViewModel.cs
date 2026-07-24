@@ -1,6 +1,7 @@
 using System.Windows.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using SisLabTopo.Services;
 using SisLabTopo.UI.Configuracion;
@@ -79,6 +80,11 @@ public partial class ShellViewModel : ObservableObject
         };
         _relojTimer.Tick += (_, _) => ActualizarFechaHora();
         _relojTimer.Start();
+
+        // Ver comentario XML de InventarioCambiadoMessage: refresca la barra de estado
+        // ante cambios de datos que ocurren sin navegar (p.ej. registrar un préstamo de
+        // 6 equipos sin salir de la pantalla de Préstamos).
+        WeakReferenceMessenger.Default.Register<InventarioCambiadoMessage>(this, (_, _) => _ = ActualizarBarraEstadoAsync());
     }
 
     private void ActualizarFechaHora()
@@ -103,7 +109,11 @@ public partial class ShellViewModel : ObservableObject
     /// ver ServiceRegistration), así que sin esto cada sesión dejaría un
     /// DispatcherTimer huérfano corriendo indefinidamente en segundo plano.
     /// </summary>
-    public void DetenerReloj() => _relojTimer.Stop();
+    public void DetenerReloj()
+    {
+        _relojTimer.Stop();
+        WeakReferenceMessenger.Default.Unregister<InventarioCambiadoMessage>(this);
+    }
 
     [RelayCommand]
     private void NavegarDashboard() => Navegar<DashboardViewModel>();

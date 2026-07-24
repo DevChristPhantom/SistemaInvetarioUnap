@@ -113,35 +113,47 @@
                     <TextBlock Grid.Column="4" Text="Acciones" Style="{StaticResource BodyStyle}" FontWeight="Bold" HorizontalAlignment="Center"/>
                 </Grid>
 
-                <ItemsControl Grid.Row="1" ItemsSource="{Binding Filas}">
-                    <ItemsControl.ItemTemplate>
-                        <DataTemplate>
-                            <Grid Margin="4,4">
-                                <Grid.ColumnDefinitions>
-                                    <ColumnDefinition Width="30"/>
-                                    <ColumnDefinition Width="*"/>
-                                    <ColumnDefinition Width="110"/>
-                                    <ColumnDefinition Width="100"/>
-                                    <ColumnDefinition Width="140"/>
-                                </Grid.ColumnDefinitions>
-                                <TextBlock Grid.Column="0" Text="{Binding Numero}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyStyle}"/>
-                                <TextBox Grid.Column="1" Text="{Binding Denominacion, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
-                                <TextBox Grid.Column="2" Text="{Binding Codigo, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
-                                <TextBox Grid.Column="3" Text="{Binding Estado, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
-                                <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Center">
-                                    <Button Content="Buscar"
-                                            Command="{Binding DataContext.BuscarCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource SecondaryButtonStyle}" Padding="8,4" Margin="0,0,4,0"/>
-                                    <Button Content="Quitar"
-                                            Command="{Binding DataContext.QuitarCommand, RelativeSource={RelativeSource AncestorType=Window}}"
-                                            CommandParameter="{Binding}"
-                                            Style="{StaticResource DangerButtonStyle}" Padding="8,4"/>
-                                </StackPanel>
-                            </Grid>
-                        </DataTemplate>
-                    </ItemsControl.ItemTemplate>
-                </ItemsControl>
+                <!--
+                    ScrollViewer añadido tras QA manual real: sin él, las 6 filas de
+                    "Filas" (fijas, ver comentario de NuevoPrestamoViewModel.Filas) no
+                    caben todas dentro de la ventana de altura fija (700px,
+                    ResizeMode="NoResize"): se comprobó con automatización de UI que
+                    las 6 filas SÍ se llenan correctamente en el ViewModel, pero solo
+                    ~3 se renderizaban visibles, las demás quedaban recortadas sin
+                    scrollbar ni ningún indicio, dejando sus botones "Buscar"/"Quitar"
+                    inalcanzables para un usuario real con mouse/teclado.
+                -->
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <ItemsControl ItemsSource="{Binding Filas}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate>
+                                <Grid Margin="4,4">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="30"/>
+                                        <ColumnDefinition Width="*"/>
+                                        <ColumnDefinition Width="110"/>
+                                        <ColumnDefinition Width="100"/>
+                                        <ColumnDefinition Width="140"/>
+                                    </Grid.ColumnDefinitions>
+                                    <TextBlock Grid.Column="0" Text="{Binding Numero}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyStyle}"/>
+                                    <TextBox Grid.Column="1" Text="{Binding Denominacion, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
+                                    <TextBox Grid.Column="2" Text="{Binding Codigo, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
+                                    <TextBox Grid.Column="3" Text="{Binding Estado, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
+                                    <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Center">
+                                        <Button Content="Buscar"
+                                                Command="{Binding DataContext.BuscarCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource SecondaryButtonStyle}" Padding="8,4" Margin="0,0,4,0"/>
+                                        <Button Content="Quitar"
+                                                Command="{Binding DataContext.QuitarCommand, RelativeSource={RelativeSource AncestorType=Window}}"
+                                                CommandParameter="{Binding}"
+                                                Style="{StaticResource DangerButtonStyle}" Padding="8,4"/>
+                                    </StackPanel>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
             </Grid>
         </GroupBox>
 
@@ -163,7 +175,7 @@
         <StackPanel Grid.Row="3" Orientation="Horizontal" HorizontalAlignment="Right" Margin="0,15,0,0">
             <Button Content="Cancelar" Command="{Binding CancelarCommand}" Style="{StaticResource SecondaryButtonStyle}" Width="100" Margin="0,0,10,0"/>
             <Button Content="Guardar" Command="{Binding GuardarCommand}" Style="{StaticResource PrimaryButtonStyle}" Width="100" Margin="0,0,10,0"/>
-            <Button Command="{Binding GuardarEImprimirCommand}" Style="{StaticResource SuccessButtonStyle}" Width="170">
+            <Button Command="{Binding GuardarEImprimirCommand}" AutomationProperties.Name="Guardar e Imprimir" Style="{StaticResource SuccessButtonStyle}" Width="170">
                 <StackPanel Orientation="Horizontal">
                     <Rectangle Width="16" Height="16" Margin="0,0,8,0" Fill="White">
                         <Rectangle.OpacityMask>

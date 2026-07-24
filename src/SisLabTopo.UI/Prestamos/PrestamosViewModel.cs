@@ -1,6 +1,7 @@
 using System.Collections.ObjectModel;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using CommunityToolkit.Mvvm.Messaging;
 using Microsoft.Extensions.Logging;
 using SisLabTopo.Domain.Models;
 using SisLabTopo.Reports;
@@ -99,6 +100,7 @@ public partial class PrestamosViewModel : ObservableObject, IShellContentViewMod
         if (viewModel.GuardadoExitoso)
         {
             await CargarAsync();
+            WeakReferenceMessenger.Default.Send(new InventarioCambiadoMessage());
         }
     }
 
@@ -143,6 +145,7 @@ public partial class PrestamosViewModel : ObservableObject, IShellContentViewMod
         if (viewModel.DevueltoExitoso)
         {
             await CargarAsync();
+            WeakReferenceMessenger.Default.Send(new InventarioCambiadoMessage());
         }
     }
 

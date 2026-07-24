@@ -12,7 +12,7 @@ Reescritura completa en **C# / .NET 10 / WPF** del sistema histórico en Java, c
 [![CI](https://github.com/DevChristPhantom/SistemaInvetarioUnap/actions/workflows/ci.yml/badge.svg)](https://github.com/DevChristPhantom/SistemaInvetarioUnap/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![WPF](https://img.shields.io/badge/UI-WPF-0078D4)](#stack-técnico)
-[![Tests](https://img.shields.io/badge/tests-172%20passing-2ea44f)](#pruebas)
+[![Tests](https://img.shields.io/badge/tests-174%20passing-2ea44f)](#pruebas)
 [![License](https://img.shields.io/badge/uso-institucional%20UNAP-blue)](LICENSE.txt)
 
 </div>
@@ -141,7 +141,7 @@ dotnet run --project src/SisLabTopo.UI
 dotnet test
 ```
 
-> 172 pruebas (unitarias + de integración con SQLite en memoria + de renderizado real de WPF) cubriendo dominio, datos, servicios, reportes y ViewModels/vistas. Corren automáticamente en cada push/PR a `main` vía [GitHub Actions](.github/workflows/ci.yml).
+> 174 pruebas (unitarias + de integración con SQLite en memoria + de renderizado real de WPF) cubriendo dominio, datos, servicios, reportes y ViewModels/vistas. Corren automáticamente en cada push/PR a `main` vía [GitHub Actions](.github/workflows/ci.yml).
 
 ### Generar el instalador
 

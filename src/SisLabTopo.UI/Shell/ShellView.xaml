@@ -116,7 +116,7 @@
                 <StackPanel Margin="0,25,0,0">
                     <Button Command="{Binding NavegarDashboardCommand}" Style="{StaticResource SidebarNavButtonStyle}"
                             Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=DashboardViewModel}"
-                            ToolTip="Dashboard">
+                            AutomationProperties.Name="Dashboard" ToolTip="Dashboard">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Style="{StaticResource SidebarIconStyle}">
                                 <Rectangle.OpacityMask>
@@ -128,7 +128,7 @@
                     </Button>
                     <Button Command="{Binding NavegarEquiposCommand}" Style="{StaticResource SidebarNavButtonStyle}"
                             Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=EquiposViewModel}"
-                            ToolTip="Equipos">
+                            AutomationProperties.Name="Equipos" ToolTip="Equipos">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Style="{StaticResource SidebarIconStyle}">
                                 <Rectangle.OpacityMask>
@@ -140,7 +140,7 @@
                     </Button>
                     <Button Command="{Binding NavegarPrestamosCommand}" Style="{StaticResource SidebarNavButtonStyle}"
                             Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=PrestamosViewModel}"
-                            ToolTip="Préstamos Activos">
+                            AutomationProperties.Name="Préstamos Activos" ToolTip="Préstamos Activos">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Style="{StaticResource SidebarIconStyle}">
                                 <Rectangle.OpacityMask>
@@ -152,7 +152,7 @@
                     </Button>
                     <Button Command="{Binding NavegarHistorialCommand}" Style="{StaticResource SidebarNavButtonStyle}"
                             Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=HistorialViewModel}"
-                            ToolTip="Historial">
+                            AutomationProperties.Name="Historial" ToolTip="Historial">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Style="{StaticResource SidebarIconStyle}">
                                 <Rectangle.OpacityMask>
@@ -164,7 +164,7 @@
                     </Button>
                     <Button Command="{Binding NavegarConfiguracionCommand}" Style="{StaticResource SidebarNavButtonStyle}"
                             Tag="{Binding CurrentViewModel, Converter={StaticResource ViewModelIsTypeConverter}, ConverterParameter=ConfiguracionViewModel}"
-                            ToolTip="Configuración">
+                            AutomationProperties.Name="Configuración" ToolTip="Configuración">
                         <StackPanel Orientation="Horizontal">
                             <Rectangle Style="{StaticResource SidebarIconStyle}">
                                 <Rectangle.OpacityMask>
@@ -238,6 +238,7 @@
                             hace nada.
                         -->
                         <Button Style="{StaticResource HeaderIconButtonStyle}"
+                                AutomationProperties.Name="Notificaciones (sin notificaciones nuevas todavía)"
                                 ToolTip="Notificaciones (sin notificaciones nuevas todavía)"
                                 Opacity="0.65"
                                 Margin="0,0,4,0">
@@ -246,6 +247,7 @@
 
                         <Button Style="{StaticResource HeaderIconButtonStyle}"
                                 Command="{Binding NavegarConfiguracionCommand}"
+                                AutomationProperties.Name="Configuración"
                                 ToolTip="Configuración"
                                 Margin="0,0,10,0">
                             <TextBlock Text="&#xE713;" FontFamily="Segoe Fluent Icons, Segoe MDL2 Assets" FontSize="15"/>
@@ -260,7 +262,7 @@
                             adentro — el binding del MenuItem usa PlacementTarget
                             porque un ContextMenu no hereda el DataContext visual normal.
                         -->
-                        <Button Style="{StaticResource HeaderUserButtonStyle}" Click="AvatarButton_Click">
+                        <Button Style="{StaticResource HeaderUserButtonStyle}" Click="AvatarButton_Click" AutomationProperties.Name="Menú de usuario">
                             <Button.ContextMenu>
                                 <ContextMenu>
                                     <MenuItem Header="Cerrar sesión"
