@@ -175,7 +175,29 @@ public class LoginViewRenderingTests
     /// ya que ambas pruebas necesitan exactamente el mismo entorno WPF mínimo fuera de
     /// <c>App.OnStartup</c>.
     /// </summary>
+    /// <summary>
+    /// Candado de la sección crítica de <see cref="AsegurarRecursosDeAplicacion"/>: xUnit
+    /// paraleliza clases de prueba distintas por defecto (una única clase corre en serie,
+    /// pero <see cref="LoginViewRenderingTests"/> y <see cref="SearchableDataGridPaginationTests"/>
+    /// SON clases distintas), y cada una llama a este método desde su propio hilo STA
+    /// dedicado (ver <see cref="EjecutarEnHiloSta{T}"/>). Sin este candado, dos hilos
+    /// pueden evaluar <c>Application.Current is not null</c> como falso al mismo tiempo
+    /// (ninguno construyó todavía la <see cref="Application"/>) y ambos intentar
+    /// <c>new Application()</c>, lo que revienta con "no se puede crear más de una
+    /// instancia System.Windows.Application en el mismo AppDomain" -- exactamente el
+    /// fallo intermitente observado al correr <c>dotnet test</c> sobre toda la solución.
+    /// </summary>
+    private static readonly object CandadoInicializacion = new();
+
     internal static void AsegurarRecursosDeAplicacion()
+    {
+        lock (CandadoInicializacion)
+        {
+            AsegurarRecursosDeAplicacionSinCandado();
+        }
+    }
+
+    private static void AsegurarRecursosDeAplicacionSinCandado()
     {
         if (Application.Current is not null)
         {

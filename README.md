@@ -9,6 +9,7 @@ Universidad Nacional del Altiplano · Facultad de Ingeniería de Minas
 
 Reescritura completa en **C# / .NET 10 / WPF** del sistema histórico en Java, con arquitectura en capas, base de datos transaccional (SQLite + EF Core) y una interfaz rediseñada desde cero con inspiración Fluent / macOS / Azure Portal.
 
+[![CI](https://github.com/DevChristPhantom/SistemaInvetarioUnap/actions/workflows/ci.yml/badge.svg)](https://github.com/DevChristPhantom/SistemaInvetarioUnap/actions/workflows/ci.yml)
 [![.NET](https://img.shields.io/badge/.NET-10-512BD4?logo=dotnet&logoColor=white)](https://dotnet.microsoft.com/)
 [![WPF](https://img.shields.io/badge/UI-WPF-0078D4)](#stack-técnico)
 [![Tests](https://img.shields.io/badge/tests-172%20passing-2ea44f)](#pruebas)
@@ -140,7 +141,7 @@ dotnet run --project src/SisLabTopo.UI
 dotnet test
 ```
 
-> 172 pruebas (unitarias + de integración con SQLite en memoria + de renderizado real de WPF) cubriendo dominio, datos, servicios, reportes y ViewModels/vistas.
+> 172 pruebas (unitarias + de integración con SQLite en memoria + de renderizado real de WPF) cubriendo dominio, datos, servicios, reportes y ViewModels/vistas. Corren automáticamente en cada push/PR a `main` vía [GitHub Actions](.github/workflows/ci.yml).
 
 ### Generar el instalador
 
