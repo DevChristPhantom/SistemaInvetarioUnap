@@ -57,15 +57,24 @@
                            HorizontalAlignment="Center" Margin="0,0,0,20"/>
 
                 <TextBlock Text="Nueva Contraseña (mín. 6 caracteres)" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
-                <PasswordBox x:Name="PasswordNueva" Height="42" FontSize="14" Margin="0,0,0,2"
-                             PasswordChanged="PasswordNueva_PasswordChanged"/>
+                <!-- Border envolvente: ver comentario en LoginView.xaml / AppPasswordBoxStyle (Themes/Controls.xaml) sobre por qué el redondeado no vive en el ControlTemplate del PasswordBox. -->
+                <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}" Height="42" Margin="0,0,0,2">
+                    <PasswordBox x:Name="PasswordNueva" FontSize="14"
+                                 PasswordChar="&#x2022;"
+                                 BorderThickness="0" Background="Transparent"
+                                 PasswordChanged="PasswordNueva_PasswordChanged"/>
+                </Border>
                 <TextBlock Text="{Binding MensajeErrorNueva}" Style="{StaticResource SmallStyle}" FontWeight="Bold"
                            Foreground="{DynamicResource DangerBrush}" Margin="0,2,0,12" TextWrapping="Wrap"
                            Visibility="{Binding MensajeErrorNueva, Converter={StaticResource StringToVisibilityConverter}}"/>
 
                 <TextBlock Text="Confirmar Contraseña" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
-                <PasswordBox x:Name="PasswordConfirmar" Height="42" FontSize="14" Margin="0,0,0,2"
-                             PasswordChanged="PasswordConfirmar_PasswordChanged"/>
+                <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}" Height="42" Margin="0,0,0,2">
+                    <PasswordBox x:Name="PasswordConfirmar" FontSize="14"
+                                 PasswordChar="&#x2022;"
+                                 BorderThickness="0" Background="Transparent"
+                                 PasswordChanged="PasswordConfirmar_PasswordChanged"/>
+                </Border>
                 <TextBlock Text="{Binding MensajeErrorConfirmar}" Style="{StaticResource SmallStyle}" FontWeight="Bold"
                            Foreground="{DynamicResource DangerBrush}" Margin="0,2,0,12" TextWrapping="Wrap"
                            Visibility="{Binding MensajeErrorConfirmar, Converter={StaticResource StringToVisibilityConverter}}"/>

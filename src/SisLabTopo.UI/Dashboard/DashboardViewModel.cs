@@ -16,6 +16,7 @@ using SisLabTopo.UI.Dialogs;
 using SisLabTopo.UI.Equipos;
 using SisLabTopo.UI.Prestamos;
 using SisLabTopo.UI.Shell;
+using SisLabTopo.UI.Theming;
 using SkiaSharp;
 
 namespace SisLabTopo.UI.Dashboard;
@@ -47,6 +48,21 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
     private readonly IDialogService _dialogService;
     private readonly IDashboardHistoryStore _historyStore;
     private readonly ILogger<DashboardViewModel> _logger;
+
+    /// <summary>
+    /// Expuesto para que <c>DashboardView</c> (code-behind) pueda suscribirse a
+    /// <see cref="Theming.IThemeService.TemaCambiado"/> en su propio Loaded/Unloaded: los
+    /// gráficos de LiveCharts2 (donut + barras) se pintan sobre un
+    /// <c>CoreMotionCanvas</c> de SkiaSharp que NO se repinta solo cuando
+    /// <c>ThemeService</c> cambia <c>Application.Resources</c> en caliente (bug real
+    /// reportado: al alternar a modo oscuro, el fondo del gráfico se queda con el color
+    /// del tema anterior hasta que el mouse pasa por encima -- el hover dispara
+    /// indirectamente un redibujado vía el pipeline de hit-testing de LiveCharts2). La
+    /// suscripción vive en la View (no aquí) para poder desuscribirse en Unloaded y evitar
+    /// que este ViewModel Transient quede referenciado para siempre por el
+    /// <c>IThemeService</c> Singleton.
+    /// </summary>
+    public IThemeService ThemeService { get; }
 
     private const string EtiquetaComparativa = "vs. última carga";
 
@@ -179,6 +195,7 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
         IComprobantePrestamoGenerator comprobanteGenerator,
         IDialogService dialogService,
         ILogger<DashboardViewModel> logger,
+        IThemeService themeService,
         IDashboardHistoryStore? historyStore = null)
     {
         _equipoService = equipoService;
@@ -187,6 +204,7 @@ public partial class DashboardViewModel : ObservableObject, IShellContentViewMod
         _comprobanteGenerator = comprobanteGenerator;
         _dialogService = dialogService;
         _logger = logger;
+        ThemeService = themeService;
         _historyStore = historyStore ?? new DashboardHistoryStore();
     }
 

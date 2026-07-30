@@ -405,11 +405,18 @@
 
     <!-- ===================== TextBox ===================== -->
     <!--
-        Redondeado (TextBoxCornerRadius, 8px). Soporte de placeholder: se reutiliza la
-        propiedad Tag como texto de placeholder (p.ej. TextBox con Tag="Buscar
-        equipo..."), superpuesto mediante un TextBlock, visible únicamente cuando Text
-        está vacío. Foco: transición de color de borde animada (antes era un salto
-        instantáneo de BorderBrush/BorderThickness).
+        IMPORTANTE: NO redefinir el ControlTemplate de TextBox en esta máquina/runtime.
+        Sobrescribir la plantilla deja el texto editable invisible (ver explicación
+        completa en el bloque de AppPasswordBoxStyle más abajo). Se usa la plantilla por
+        defecto del tema (que sí renderiza el texto) + estos setters visuales.
+
+        Compromiso conocido de este arreglo respecto a la versión anterior (que sí rompía
+        el render): se pierden (a) las esquinas redondeadas de 8px (ahora el borde por
+        defecto es de esquinas rectas; si se necesita el look redondeado, envolver el
+        TextBox en un Border con CornerRadius en la vista, como en LoginView.xaml) y
+        (b) el placeholder basado en Tag (el TextBlock superpuesto vivía dentro de la
+        plantilla). El placeholder puede reintroducirse luego con un comportamiento
+        adjunto que funcione sobre la plantilla por defecto, si se requiere.
     -->
     <Style x:Key="AppTextBoxStyle" TargetType="TextBox">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
@@ -421,88 +428,39 @@
         <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
         <Setter Property="CaretBrush" Value="{DynamicResource TextDarkBrush}"/>
         <Setter Property="SelectionBrush" Value="{DynamicResource SecondaryBrush}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="TextBox">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource TextBoxCornerRadius}">
-                        <Grid>
-                            <TextBlock x:Name="PlaceholderText"
-                                       Text="{TemplateBinding Tag}"
-                                       Margin="{TemplateBinding Padding}"
-                                       VerticalAlignment="Center"
-                                       Foreground="{DynamicResource TextLightBrush}"
-                                       FontFamily="{TemplateBinding FontFamily}"
-                                       FontSize="{TemplateBinding FontSize}"
-                                       IsHitTestVisible="False"
-                                       Visibility="Collapsed"/>
-                            <ScrollViewer x:Name="PART_ContentHost"
-                                          Margin="{TemplateBinding Padding}"
-                                          VerticalAlignment="Center"/>
-                        </Grid>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="#94A3B8"/>
-                        </Trigger>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
-                            <Setter TargetName="Bd" Property="BorderThickness" Value="1.5"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
-                        </Trigger>
-                        <MultiTrigger>
-                            <MultiTrigger.Conditions>
-                                <Condition Property="Text" Value=""/>
-                            </MultiTrigger.Conditions>
-                            <Setter TargetName="PlaceholderText" Property="Visibility" Value="Visible"/>
-                        </MultiTrigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style TargetType="TextBox" BasedOn="{StaticResource AppTextBoxStyle}"/>
 
-    <!-- PasswordBox con el mismo lenguaje visual que TextBox -->
+    <!--
+        PasswordBox con el mismo lenguaje visual que TextBox.
+
+        Causa raíz REAL del bug "no se ve la contraseña que escribo" (confirmada
+        empíricamente con RenderTargetBitmap, no solo captura de pantalla, y reproducida
+        tanto en modo hardware como SoftwareOnly): en la máquina/runtime de esta estación,
+        SOBRESCRIBIR el ControlTemplate de un TextBox/PasswordBox hace que el texto/máscara
+        editable no se pinte (solo se ve el cursor). La plantilla POR DEFECTO del tema WPF
+        sí pinta el texto/puntos correctamente; cualquier ControlTemplate propio (incluso
+        uno que imita al de por defecto) lo deja en blanco. NO es un problema de glifo
+        (● U+25CF vs • U+2022 se ven igual bien con la plantilla por defecto), NI de
+        contraste, NI de RenderOptions.ProcessRenderMode=SoftwareOnly.
+
+        Solución: NO redefinir Template aquí. Se usan la plantilla por defecto (que sí
+        renderiza) + estos setters visuales. Las esquinas redondeadas ya no se logran con
+        una plantilla propia (rompería el render), sino envolviendo el control en un
+        <Border CornerRadius=...> en la vista (ver LoginView.xaml). PasswordChar="•" se
+        fija en cada elemento (es propiedad CLR, no DependencyProperty).
+    -->
     <Style x:Key="AppPasswordBoxStyle" TargetType="PasswordBox">
         <Setter Property="FontFamily" Value="{StaticResource AppFontFamily}"/>
         <Setter Property="FontSize" Value="15"/>
         <Setter Property="Foreground" Value="{DynamicResource TextDarkBrush}"/>
-        <Setter Property="Padding" Value="12,10"/>
+        <Setter Property="CaretBrush" Value="{DynamicResource TextDarkBrush}"/>
+        <Setter Property="Padding" Value="12,8"/>
         <Setter Property="BorderThickness" Value="1"/>
+        <Setter Property="BorderBrush" Value="{DynamicResource BorderLightBrush}"/>
         <Setter Property="Background" Value="{DynamicResource CardBrush}"/>
-        <Setter Property="Template">
-            <Setter.Value>
-                <ControlTemplate TargetType="PasswordBox">
-                    <Border x:Name="Bd"
-                            Background="{TemplateBinding Background}"
-                            BorderBrush="{TemplateBinding BorderBrush}"
-                            BorderThickness="{TemplateBinding BorderThickness}"
-                            CornerRadius="{StaticResource TextBoxCornerRadius}">
-                        <ScrollViewer x:Name="PART_ContentHost"
-                                      Margin="{TemplateBinding Padding}"
-                                      VerticalAlignment="Center"/>
-                    </Border>
-                    <ControlTemplate.Triggers>
-                        <Trigger Property="IsMouseOver" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="#94A3B8"/>
-                        </Trigger>
-                        <Trigger Property="IsFocused" Value="True">
-                            <Setter TargetName="Bd" Property="BorderBrush" Value="{DynamicResource FocusBorderBrush}"/>
-                            <Setter TargetName="Bd" Property="BorderThickness" Value="1.5"/>
-                        </Trigger>
-                        <Trigger Property="IsEnabled" Value="False">
-                            <Setter TargetName="Bd" Property="Opacity" Value="0.6"/>
-                        </Trigger>
-                    </ControlTemplate.Triggers>
-                </ControlTemplate>
-            </Setter.Value>
-        </Setter>
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
     </Style>
     <Style TargetType="PasswordBox" BasedOn="{StaticResource AppPasswordBoxStyle}"/>
 

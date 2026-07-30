@@ -56,10 +56,28 @@
                            HorizontalAlignment="Center"
                            Margin="0,0,0,20"/>
 
-                <PasswordBox x:Name="PasswordInput"
-                             Height="46"
-                             FontSize="15"
-                             KeyDown="PasswordInput_KeyDown"/>
+                <!--
+                    El look redondeado del campo lo da este Border envolvente, NO un
+                    ControlTemplate propio del PasswordBox: sobrescribir la plantilla de
+                    un PasswordBox/TextBox en esta máquina deja la máscara/el texto
+                    invisibles (solo se ve el cursor). Ver nota en Themes/Controls.xaml
+                    (AppPasswordBoxStyle). El PasswordBox va sin borde ni fondo propios
+                    (BorderThickness=0, Background=Transparent) para que solo se vea el
+                    borde redondeado del Border.
+                -->
+                <Border CornerRadius="{StaticResource TextBoxCornerRadius}"
+                        BorderBrush="{DynamicResource BorderLightBrush}"
+                        BorderThickness="1"
+                        Background="{DynamicResource CardBrush}"
+                        Height="46">
+                    <PasswordBox x:Name="PasswordInput"
+                                 FontSize="15"
+                                 PasswordChar="&#x2022;"
+                                 BorderThickness="0"
+                                 Background="Transparent"
+                                 VerticalContentAlignment="Center"
+                                 KeyDown="PasswordInput_KeyDown"/>
+                </Border>
 
                 <TextBlock Text="{Binding ErrorMessage}"
                            Style="{StaticResource SmallStyle}"

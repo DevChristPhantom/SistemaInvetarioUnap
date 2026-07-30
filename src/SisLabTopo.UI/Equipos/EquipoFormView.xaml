@@ -14,7 +14,10 @@
     <StackPanel Margin="24" IsEnabled="{Binding IsBusy, Converter={StaticResource InverseBoolConverter}}">
 
         <TextBlock Text="Código Patrimonial:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
-        <TextBox x:Name="CodigoBox" Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EsEdicion, Converter={StaticResource InverseBoolConverter}}"/>
+        <!-- Border envolvente: ver comentario en LoginView.xaml / AppTextBoxStyle (Themes/Controls.xaml) sobre por qué el redondeado no vive en el ControlTemplate del TextBox. -->
+        <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+            <TextBox x:Name="CodigoBox" BorderThickness="0" Background="Transparent" Text="{Binding Codigo, UpdateSourceTrigger=PropertyChanged}" IsEnabled="{Binding EsEdicion, Converter={StaticResource InverseBoolConverter}}"/>
+        </Border>
         <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=CodigoBox}" Margin="0,2,0,0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -24,7 +27,9 @@
         </ItemsControl>
 
         <TextBlock Text="Denominación:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-        <TextBox x:Name="DenominacionBox" Text="{Binding Denominacion, UpdateSourceTrigger=PropertyChanged}"/>
+        <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+            <TextBox x:Name="DenominacionBox" BorderThickness="0" Background="Transparent" Text="{Binding Denominacion, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
         <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=DenominacionBox}" Margin="0,2,0,0">
             <ItemsControl.ItemTemplate>
                 <DataTemplate>
@@ -34,13 +39,19 @@
         </ItemsControl>
 
         <TextBlock Text="Marca:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-        <TextBox Text="{Binding Marca, UpdateSourceTrigger=PropertyChanged}"/>
+        <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+            <TextBox BorderThickness="0" Background="Transparent" Text="{Binding Marca, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
 
         <TextBlock Text="Modelo:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-        <TextBox Text="{Binding Modelo, UpdateSourceTrigger=PropertyChanged}"/>
+        <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+            <TextBox BorderThickness="0" Background="Transparent" Text="{Binding Modelo, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
 
         <TextBlock Text="N° de Serie:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-        <TextBox Text="{Binding Serie, UpdateSourceTrigger=PropertyChanged}"/>
+        <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+            <TextBox BorderThickness="0" Background="Transparent" Text="{Binding Serie, UpdateSourceTrigger=PropertyChanged}"/>
+        </Border>
 
         <!--
             Etiqueta() es un método de extensión (no una propiedad), así que
@@ -67,8 +78,10 @@
         </ComboBox>
 
         <TextBlock Text="Observaciones:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,12,0,4"/>
-        <TextBox Text="{Binding Observaciones, UpdateSourceTrigger=PropertyChanged}"
-                 AcceptsReturn="True" TextWrapping="Wrap" Height="60" VerticalScrollBarVisibility="Auto"/>
+        <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+            <TextBox BorderThickness="0" Background="Transparent" Text="{Binding Observaciones, UpdateSourceTrigger=PropertyChanged}"
+                     AcceptsReturn="True" TextWrapping="Wrap" Height="60" VerticalScrollBarVisibility="Auto"/>
+        </Border>
 
         <TextBlock Text="{Binding MensajeError}"
                    Style="{StaticResource SmallStyle}"

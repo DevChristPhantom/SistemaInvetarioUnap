@@ -7,6 +7,7 @@ using SisLabTopo.Services;
 using SisLabTopo.UI.Dashboard;
 using SisLabTopo.UI.Dialogs;
 using SisLabTopo.UI.Prestamos;
+using SisLabTopo.UI.Theming;
 
 namespace SisLabTopo.UI.Tests;
 
@@ -92,7 +93,7 @@ public class DashboardViewModelTests
 
         return new DashboardViewModel(
             equipoService.Object, prestamoService.Object, reporteService.Object, comprobanteGenerator.Object,
-            dialogService.Object, NullLogger<DashboardViewModel>.Instance,
+            dialogService.Object, NullLogger<DashboardViewModel>.Instance, new Mock<IThemeService>().Object,
             new FakeDashboardHistoryStore());
     }
 
@@ -270,7 +271,7 @@ public class DashboardViewModelTests
 
         var vm = new DashboardViewModel(
             equipoService.Object, prestamoService.Object, reporteService.Object, comprobanteGenerator.Object,
-            dialogService.Object, NullLogger<DashboardViewModel>.Instance, historyStore);
+            dialogService.Object, NullLogger<DashboardViewModel>.Instance, new Mock<IThemeService>().Object, historyStore);
 
         await vm.CargarCommand.ExecuteAsync(null);
 

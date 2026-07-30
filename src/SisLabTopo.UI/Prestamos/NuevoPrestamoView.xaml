@@ -36,7 +36,9 @@
 
                 <TextBlock Grid.Row="0" Grid.Column="0" Text="Docente:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,5,8,5" VerticalAlignment="Center"/>
                 <StackPanel Grid.Row="0" Grid.Column="1" Margin="0,5,15,5">
-                    <TextBox x:Name="DocenteBox" Text="{Binding Docente, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+                        <TextBox x:Name="DocenteBox" BorderThickness="0" Background="Transparent" Text="{Binding Docente, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=DocenteBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -47,11 +49,15 @@
                 </StackPanel>
 
                 <TextBlock Grid.Row="0" Grid.Column="2" Text="Fecha préstamo:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,5,8,5" VerticalAlignment="Center"/>
-                <TextBox Grid.Row="0" Grid.Column="3" Text="{Binding FechaPrestamo, StringFormat='dd/MM/yyyy', Mode=OneTime}" IsEnabled="False" Margin="0,5,0,5"/>
+                <Border Grid.Row="0" Grid.Column="3" CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}" Margin="0,5,0,5">
+                    <TextBox Text="{Binding FechaPrestamo, StringFormat='dd/MM/yyyy', Mode=OneTime}" IsEnabled="False" BorderThickness="0" Background="Transparent"/>
+                </Border>
 
                 <TextBlock Grid.Row="1" Grid.Column="0" Text="Curso:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,5,8,5" VerticalAlignment="Center"/>
                 <StackPanel Grid.Row="1" Grid.Column="1" Margin="0,5,15,5">
-                    <TextBox x:Name="CursoBox" Text="{Binding Curso, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+                        <TextBox x:Name="CursoBox" BorderThickness="0" Background="Transparent" Text="{Binding Curso, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=CursoBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -66,7 +72,9 @@
 
                 <TextBlock Grid.Row="2" Grid.Column="0" Text="Estudiante:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,5,8,5" VerticalAlignment="Center"/>
                 <StackPanel Grid.Row="2" Grid.Column="1" Margin="0,5,15,5">
-                    <TextBox x:Name="EstudianteBox" Text="{Binding Estudiante, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+                        <TextBox x:Name="EstudianteBox" BorderThickness="0" Background="Transparent" Text="{Binding Estudiante, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=EstudianteBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -78,7 +86,9 @@
 
                 <TextBlock Grid.Row="2" Grid.Column="2" Text="Cód. Estudiante:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,5,8,5" VerticalAlignment="Center"/>
                 <StackPanel Grid.Row="2" Grid.Column="3" Margin="0,5,0,5">
-                    <TextBox x:Name="CodigoEstudianteBox" Text="{Binding CodigoEstudiante, UpdateSourceTrigger=PropertyChanged}"/>
+                    <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+                        <TextBox x:Name="CodigoEstudianteBox" BorderThickness="0" Background="Transparent" Text="{Binding CodigoEstudiante, UpdateSourceTrigger=PropertyChanged}"/>
+                    </Border>
                     <ItemsControl ItemsSource="{Binding (Validation.Errors), ElementName=CodigoEstudianteBox}">
                         <ItemsControl.ItemTemplate>
                             <DataTemplate>
@@ -136,9 +146,15 @@
                                         <ColumnDefinition Width="140"/>
                                     </Grid.ColumnDefinitions>
                                     <TextBlock Grid.Column="0" Text="{Binding Numero}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource BodyStyle}"/>
-                                    <TextBox Grid.Column="1" Text="{Binding Denominacion, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
-                                    <TextBox Grid.Column="2" Text="{Binding Codigo, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
-                                    <TextBox Grid.Column="3" Text="{Binding Estado, Mode=OneWay}" IsReadOnly="True" Margin="0,0,6,0"/>
+                                    <Border Grid.Column="1" CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}" Margin="0,0,6,0">
+                                        <TextBox Text="{Binding Denominacion, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent"/>
+                                    </Border>
+                                    <Border Grid.Column="2" CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}" Margin="0,0,6,0">
+                                        <TextBox Text="{Binding Codigo, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent"/>
+                                    </Border>
+                                    <Border Grid.Column="3" CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}" Margin="0,0,6,0">
+                                        <TextBox Text="{Binding Estado, Mode=OneWay}" IsReadOnly="True" BorderThickness="0" Background="Transparent"/>
+                                    </Border>
                                     <StackPanel Grid.Column="4" Orientation="Horizontal" HorizontalAlignment="Center">
                                         <Button Content="Buscar"
                                                 Command="{Binding DataContext.BuscarCommand, RelativeSource={RelativeSource AncestorType=Window}}"
@@ -160,8 +176,11 @@
         <!-- ===================== Observaciones ===================== -->
         <StackPanel Grid.Row="2" Margin="0,12,0,0">
             <TextBlock Text="Observaciones:" Style="{StaticResource BodyStyle}" FontWeight="Bold" Margin="0,0,0,4"/>
-            <TextBox Text="{Binding Observaciones, UpdateSourceTrigger=PropertyChanged}"
-                     AcceptsReturn="True" TextWrapping="Wrap" Height="55" VerticalScrollBarVisibility="Auto"/>
+            <Border CornerRadius="{StaticResource TextBoxCornerRadius}" BorderBrush="{DynamicResource BorderLightBrush}" BorderThickness="1" Background="{DynamicResource CardBrush}">
+                <TextBox Text="{Binding Observaciones, UpdateSourceTrigger=PropertyChanged}"
+                         BorderThickness="0" Background="Transparent"
+                         AcceptsReturn="True" TextWrapping="Wrap" Height="55" VerticalScrollBarVisibility="Auto"/>
+            </Border>
             <TextBlock Text="{Binding MensajeError}"
                        Style="{StaticResource SmallStyle}"
                        FontWeight="Bold"
